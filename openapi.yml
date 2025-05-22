@@ -1,0 +1,682 @@
+openapi: 3.0.0
+info:
+  title: Trivia API
+  description: API for a trivia game
+  version: 1.0.0
+servers:
+  - url: https://trivia-api.artemrudenko.com
+    description: Production server
+  - url: http://localhost:8080
+    description: Development server
+
+paths:
+  /rooms:
+    post:
+      summary: Create a room
+      operationId: createRoom
+      responses:
+        '201':
+          description: Room created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+
+  /rooms/{roomId}:
+    get:
+      summary: Get a room
+      operationId: getRoom
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Room retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+        '404':
+          description: Room not found
+
+    delete:
+      summary: Delete a room
+      operationId: deleteRoom
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Room deleted
+        '403':
+          description: Only the host can delete the room
+        '404':
+          description: Room not found
+
+  /rooms/{roomId}/players:
+    post:
+      summary: Join a room as a player
+      operationId: joinRoom
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  minLength: 3
+              required:
+                - username
+      responses:
+        '201':
+          description: Joined the room
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Player'
+        '404':
+          description: Room not found
+
+    get:
+      summary: Get the players of a room
+      operationId: getPlayers
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Players retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Player'
+        '404':
+          description: Room or player not found
+
+  /rooms/{roomId}/players/{playerId}:
+    delete:
+      summary: Remove a player from a room
+      operationId: deletePlayer
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: playerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Player deleted
+        '403':
+          description: Only the host can delete another player
+        '404':
+          description: Room or player not found
+
+  /rooms/{roomId}/teams:
+    post:
+      summary: Create a team
+      operationId: createTeam
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Team created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+        '404':
+          description: Room not found
+
+    get:
+      summary: Get the teams of a room
+      operationId: getTeams
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Teams retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Team'
+        '404':
+          description: Room not found
+
+  /rooms/{roomId}/teams/{teamId}:
+    delete:
+      summary: Delete a team
+      operationId: deleteTeam
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Team deleted
+        '403':
+          description: Only the host can delete a team
+        '404':
+          description: Room or team not found
+
+  /rooms/{roomId}/teams/{teamId}/players:
+    get:
+      summary: Get the players of a team
+      operationId: getTeamPlayers
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Players retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Player'
+        '404':
+          description: Room or team not found
+
+  /rooms/{roomId}/teams/{teamId}/players/{playerId}:
+    put:
+      summary: Assign a player to a team
+      operationId: assignPlayerToTeam
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: playerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Player assigned to team
+        '403':
+          description: Invalid team assignment
+        '404':
+          description: Room, team or player not found
+
+    delete:
+      summary: Remove a player from a team
+      operationId: removePlayerFromTeam
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: playerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Player removed from team
+        '403':
+          description: Only the host can remove another player
+        '404':
+          description: Room, team or player not found
+
+  /rooms/{roomId}/settings:
+    get:
+      summary: Get the settings of a room
+      operationId: getRoomSettings
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Settings retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Settings'
+        '404':
+          description: Room not found
+
+    put:
+      summary: Update the settings of a room
+      operationId: updateSettings
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Settings'
+      responses:
+        '200':
+          description: Settings updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Settings'
+        '403':
+          description: Only the host can update the settings
+        '404':
+          description: Room not found
+
+  /games:
+    post:
+      summary: Create a game with the players of a room
+      operationId: createGame
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                roomId:
+                  type: string
+              required:
+                - roomId
+      responses:
+        '201':
+          description: Game created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+        '403':
+          description: Only the host can create a game
+        '404':
+          description: Room not found
+
+  /games/{gameId}:
+    get:
+      summary: Get the details of a game
+      operationId: getGame
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Game retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+        '404':
+          description: Game not found
+
+    delete:
+      summary: Delete a game
+      operationId: deleteGame
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Game deleted
+        '403':
+          description: Only the host can end the game
+        '404':
+          description: Game not found
+  
+  /game/{gameId}/settings:
+    get:
+      summary: Get the settings of a game
+      operationId: getGameSettings
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Settings retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Settings'
+        '404':
+          description: Game not found
+
+  /games/{gameId}/rounds:
+    get:
+      summary: Get the rounds of a game
+      operationId: getRounds
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Rounds retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Round'
+        '404':
+          description: Game not found
+
+  /games/{gameId}/rounds/{roundId}/questions:
+    get:
+      summary: Get the questions of a round
+      operationId: getRoundQuestions
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Questions retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Question'
+        '404':
+          description: Game or round not found
+
+  /games/{gameId}/rounds/{roundId}/questions/{questionId}/players/{playerId}:
+    post:
+      summary: Submit the answer to a question
+      operationId: submitAnswer
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: questionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: playerId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                answer:
+                  type: string
+              required:
+                - answer
+      responses:
+        '200':
+          description: Answer submitted
+        '400':
+          description: Round has already ended
+        '403':
+          description: Unauthorized
+        '404':
+          description: Game, round, question or player not found
+
+    get:
+      summary: Get the answer of a question
+      operationId: getAnswer
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: questionId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: playerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Answer retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Answer'
+        '400':
+          description: Round has not ended yet
+        '403':
+          description: Unauthorized
+        '404':
+          description: Game, round, question or player not found
+
+components:
+  schemas:
+    Room:
+      type: object
+      properties:
+        roomId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        settingsId:
+          type: string
+
+    Player:
+      type: object
+      properties:
+        playerId:
+          type: string
+        roomId:
+          type: string
+        teamId:
+          type: string
+          nullable: true
+        username:
+          type: string
+        host:
+          type: boolean
+        score:
+          type: integer
+
+    Team:
+      type: object
+      properties:
+        teamId:
+          type: string
+        score:
+          type: integer
+
+    Settings:
+      type: object
+      properties:
+        settingsId:
+          type: string
+        rounds:
+          type: integer
+          minimum: 1
+        timePerRound:
+          type: integer
+          minimum: 10
+        questionsPerRound:
+          type: integer
+          minimum: 1
+        difficulty:
+          type: string
+          enum: [easy, medium, hard]
+        maxPlayersPerTeam:
+          type: integer
+          minimum: 1
+
+    Game:
+      type: object
+      properties:
+        gameId:
+          type: string
+        roomId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        endedAt:
+          type: string
+          format: date-time
+          nullable: true
+        settingsId:
+          type: string
+
+    Round:
+      type: object
+      properties:
+        roundId:
+          type: string
+        gameId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        endedAt:
+          type: string
+          format: date-time
+
+    Question:
+      type: object
+      properties:
+        questionId:
+          type: string
+        type:
+          type: string
+          enum: [multiple_choice, short_answer, buzzer]
+        points:
+          type: integer
+        text:
+          type: string
+        mediaUrl:
+          type: string
+          nullable: true
+        options:
+          type: array
+          items:
+            type: string
+          nullable: true
+        correctAnswers:
+          type: array
+          items:
+            type: string
+          nullable: true # null if round has not ended
+
+    Answer:
+      type: object
+      properties:
+        answerId:
+          type: string
+        gameId:
+          type: string
+        roundId:
+          type: string
+        questionId:
+          type: string
+        playerId:
+          type: string
+        answer:
+          type: string
+        correct:
+          type: boolean
+          nullable: true # null if round has not ended
+
