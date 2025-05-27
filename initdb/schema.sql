@@ -1,0 +1,62 @@
+CREATE TABLE rooms (
+    room_id VARCHAR(255) PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
+CREATE TABLE teams (
+    team_id VARCHAR(255) PRIMARY KEY,
+    room_id VARCHAR(255) NOT NULL REFERENCES rooms(room_id)
+);
+
+CREATE TABLE players (
+    player_id VARCHAR(255) PRIMARY KEY,
+    room_id VARCHAR(255) NOT NULL REFERENCES rooms(room_id),
+    team_id VARCHAR(255) NULL REFERENCES teams(team_id),
+    username VARCHAR(255) NOT NULL,
+    host BOOLEAN NOT NULL
+);
+
+CREATE TABLE games (
+    game_id VARCHAR(255) PRIMARY KEY,
+    room_id VARCHAR(255) NOT NULL REFERENCES rooms(room_id),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    ended_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    rounds INTEGER NOT NULL CHECK (rounds >= 1),
+    time_per_round INTEGER NOT NULL CHECK (time_per_round >= 10),
+    questions_per_round INTEGER NOT NULL CHECK (questions_per_round >= 1),
+    difficulty INTEGER NOT NULL CHECK (difficulty >= 0)
+);
+
+CREATE TABLE rounds (
+    round_id VARCHAR(255) PRIMARY KEY,
+    game_id VARCHAR(255) NOT NULL REFERENCES games(game_id),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    ended_at TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
+CREATE TABLE questions (
+    question_id VARCHAR(255) PRIMARY KEY,
+    type VARCHAR(50) NOT NULL CHECK (type IN ('multiple_choice', 'short_answer', 'buzzer')),
+    difficulty INTEGER NOT NULL DEFAULT 1,
+    text TEXT NOT NULL,
+    media_url TEXT NULL,
+    options TEXT[] NULL,
+    correct_answers TEXT[] NULL
+);
+
+CREATE TABLE round_questions (
+    round_id VARCHAR(255) NOT NULL REFERENCES rounds(round_id),
+    question_id VARCHAR(255) NOT NULL REFERENCES questions(question_id),
+    PRIMARY KEY (round_id, question_id)
+);
+
+CREATE TABLE answers (
+    answer_id VARCHAR(255) PRIMARY KEY,
+    game_id VARCHAR(255) NOT NULL REFERENCES games(game_id),
+    round_id VARCHAR(255) NOT NULL REFERENCES rounds(round_id),
+    question_id VARCHAR(255) NOT NULL REFERENCES questions(question_id),
+    player_id VARCHAR(255) NOT NULL REFERENCES players(player_id),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    answer TEXT NOT NULL,
+    correct BOOLEAN NULL
+);
