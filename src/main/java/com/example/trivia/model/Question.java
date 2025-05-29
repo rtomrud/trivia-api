@@ -8,7 +8,7 @@ import java.util.List;
 @Table("questions")
 public class Question {
     @Id
-    private String questionId;
+    private Long questionId;
     private String type; // "multiple_choice", "short_answer" or "buzzer"
     private Integer difficulty;
     private String text;
@@ -19,11 +19,11 @@ public class Question {
     public Question() {
     }
 
-    public String getQuestionId() {
+    public Long getQuestionId() {
         return questionId;
     }
 
-    public void setQuestionId(String questionId) {
+    public void setQuestionId(Long questionId) {
         this.questionId = questionId;
     }
 

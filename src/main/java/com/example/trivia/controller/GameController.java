@@ -46,19 +46,18 @@ public class GameController {
     public ResponseEntity<Game> createGame(
             @RequestBody Map<String, Object> body,
             HttpSession session) {
-        String roomId = (String) body.get("roomId");
+        Long roomId = (Long) body.get("roomId");
         Optional<Room> roomOptional = roomRepo.findById(roomId);
         if (roomOptional.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
 
-        Player currentPlayer = (Player) session.getAttribute(roomId);
+        Player currentPlayer = (Player) session.getAttribute(roomId.toString());
         if (currentPlayer == null || !currentPlayer.isHost()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         Game game = new Game();
-        game.setGameId(UUID.randomUUID().toString());
         game.setRoomId(roomId);
         game.setRounds((Integer) body.get("rounds"));
         game.setTimePerRound((Integer) body.get("timePerRound"));
@@ -70,11 +69,10 @@ public class GameController {
         gameRepo.save(game);
 
         // Create rounds and questions for the game, based on the game's settings
-        Set<String> questionIds = new HashSet<>();
+        Set<Long> questionIds = new HashSet<>();
         long count = questionRepo.count();
         for (int roundNumber = 1; roundNumber <= game.getRounds(); roundNumber++) {
             Round round = new Round();
-            round.setRoundId(UUID.randomUUID().toString());
             round.setGameId(game.getGameId());
             round.setRoundNumber(roundNumber);
             round.setCreatedAt(Instant.now().plus(
@@ -107,7 +105,7 @@ public class GameController {
     }
 
     @GetMapping("/games/{gameId}")
-    public ResponseEntity<Game> getGame(@PathVariable String gameId) {
+    public ResponseEntity<Game> getGame(@PathVariable Long gameId) {
         Optional<Game> gameOptional = gameRepo.findById(gameId);
         if (gameOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -118,15 +116,15 @@ public class GameController {
     }
 
     @DeleteMapping("/games/{gameId}")
-    public ResponseEntity<Void> deleteGame(@PathVariable String gameId, HttpSession session) {
+    public ResponseEntity<Void> deleteGame(@PathVariable Long gameId, HttpSession session) {
         Optional<Game> gameOptional = gameRepo.findById(gameId);
         if (gameOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
         Game game = gameOptional.get();
-        String roomId = game.getRoomId();
-        Player currentPlayer = (Player) session.getAttribute(roomId);
+        Long roomId = game.getRoomId();
+        Player currentPlayer = (Player) session.getAttribute(roomId.toString());
         if (currentPlayer == null || !currentPlayer.isHost()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
@@ -136,7 +134,7 @@ public class GameController {
     }
 
     @GetMapping("/games/{gameId}/rounds")
-    public ResponseEntity<List<Round>> getRounds(@PathVariable String gameId) {
+    public ResponseEntity<List<Round>> getRounds(@PathVariable Long gameId) {
         Optional<Game> gameOptional = gameRepo.findById(gameId);
         if (gameOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -148,8 +146,8 @@ public class GameController {
 
     @GetMapping("/games/{gameId}/rounds/{roundId}/questions")
     public ResponseEntity<List<Question>> getRoundQuestions(
-            @PathVariable String gameId,
-            @PathVariable String roundId) {
+            @PathVariable Long gameId,
+            @PathVariable Long roundId) {
         Optional<Game> gameOptional = gameRepo.findById(gameId);
         Optional<Round> roundOptional = roundRepo.findById(roundId);
         if (gameOptional.isEmpty() || roundOptional.isEmpty()) {
@@ -174,10 +172,10 @@ public class GameController {
 
     @PostMapping("/games/{gameId}/rounds/{roundId}/questions/{questionId}/players/{playerId}")
     public ResponseEntity<Void> submitAnswer(
-            @PathVariable String gameId,
-            @PathVariable String roundId,
-            @PathVariable String questionId,
-            @PathVariable String playerId,
+            @PathVariable Long gameId,
+            @PathVariable Long roundId,
+            @PathVariable Long questionId,
+            @PathVariable Long playerId,
             @RequestBody Map<String, Object> body,
             HttpSession session) {
         Optional<Game> gameOptional = gameRepo.findById(gameId);
@@ -198,14 +196,13 @@ public class GameController {
         }
 
         Game game = gameOptional.get();
-        String roomId = game.getRoomId();
-        Player currentPlayer = (Player) session.getAttribute(roomId);
+        Long roomId = game.getRoomId();
+        Player currentPlayer = (Player) session.getAttribute(roomId.toString());
         if (currentPlayer == null || !currentPlayer.getPlayerId().equals(playerId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         Answer answer = new Answer();
-        answer.setAnswerId(UUID.randomUUID().toString());
         answer.setGameId(gameId);
         answer.setRoundId(roundId);
         answer.setQuestionId(questionId);
@@ -231,10 +228,10 @@ public class GameController {
 
     @GetMapping("/games/{gameId}/rounds/{roundId}/questions/{questionId}/players/{playerId}")
     public ResponseEntity<Answer> getAnswer(
-            @PathVariable String gameId,
-            @PathVariable String roundId,
-            @PathVariable String questionId,
-            @PathVariable String playerId,
+            @PathVariable Long gameId,
+            @PathVariable Long roundId,
+            @PathVariable Long questionId,
+            @PathVariable Long playerId,
             HttpSession session) {
         Optional<Game> gameOptional = gameRepo.findById(gameId);
         Optional<Round> roundOptional = roundRepo.findById(roundId);
@@ -257,8 +254,8 @@ public class GameController {
         }
 
         Game game = gameOptional.get();
-        String roomId = game.getRoomId();
-        Player currentPlayer = (Player) session.getAttribute(roomId);
+        Long roomId = game.getRoomId();
+        Player currentPlayer = (Player) session.getAttribute(roomId.toString());
         if (currentPlayer == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }

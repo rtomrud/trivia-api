@@ -8,11 +8,11 @@ import java.time.Instant;
 @Table("answers")
 public class Answer {
     @Id
-    private String answerId;
-    private String gameId;
-    private String roundId;
-    private String questionId;
-    private String playerId;
+    private Long answerId;
+    private Long gameId;
+    private Long roundId;
+    private Long questionId;
+    private Long playerId;
     private Instant createdAt;
     private String answer;
     private Boolean correct; // nullable
@@ -20,43 +20,43 @@ public class Answer {
     public Answer() {
     }
 
-    public String getAnswerId() {
+    public Long getAnswerId() {
         return answerId;
     }
 
-    public void setAnswerId(String answerId) {
+    public void setAnswerId(Long answerId) {
         this.answerId = answerId;
     }
 
-    public String getGameId() {
+    public Long getGameId() {
         return gameId;
     }
 
-    public void setGameId(String gameId) {
+    public void setGameId(Long gameId) {
         this.gameId = gameId;
     }
 
-    public String getRoundId() {
+    public Long getRoundId() {
         return roundId;
     }
 
-    public void setRoundId(String roundId) {
+    public void setRoundId(Long roundId) {
         this.roundId = roundId;
     }
 
-    public String getQuestionId() {
+    public Long getQuestionId() {
         return questionId;
     }
 
-    public void setQuestionId(String questionId) {
+    public void setQuestionId(Long questionId) {
         this.questionId = questionId;
     }
 
-    public String getPlayerId() {
+    public Long getPlayerId() {
         return playerId;
     }
 
-    public void setPlayerId(String playerId) {
+    public void setPlayerId(Long playerId) {
         this.playerId = playerId;
     }
 

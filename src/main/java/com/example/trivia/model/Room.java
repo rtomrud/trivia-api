@@ -8,17 +8,17 @@ import java.time.Instant;
 @Table("rooms")
 public class Room {
     @Id
-    private String roomId;
+    private Long roomId;
     private Instant createdAt;
 
     public Room() {
     }
 
-    public String getRoomId() {
+    public Long getRoomId() {
         return roomId;
     }
 
-    public void setRoomId(String roomId) {
+    public void setRoomId(Long roomId) {
         this.roomId = roomId;
     }
 

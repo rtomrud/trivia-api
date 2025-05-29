@@ -4,25 +4,25 @@ import org.springframework.data.relational.core.mapping.Table;
 
 @Table("round_questions")
 public class RoundQuestion {
-    private String roundId;
-    private String questionId;
+    private Long roundId;
+    private Long questionId;
 
     public RoundQuestion() {
     }
 
-    public String getRoundId() {
+    public Long getRoundId() {
         return roundId;
     }
 
-    public void setRoundId(String roundId) {
+    public void setRoundId(Long roundId) {
         this.roundId = roundId;
     }
 
-    public String getQuestionId() {
+    public Long getQuestionId() {
         return questionId;
     }
 
-    public void setQuestionId(String questionId) {
+    public void setQuestionId(Long questionId) {
         this.questionId = questionId;
     }
 }

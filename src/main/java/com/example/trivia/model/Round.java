@@ -8,8 +8,8 @@ import java.time.Instant;
 @Table("rounds")
 public class Round {
     @Id
-    private String roundId;
-    private String gameId;
+    private Long roundId;
+    private Long gameId;
     private Integer roundNumber;
     private Instant createdAt;
     private Instant endedAt;
@@ -17,19 +17,19 @@ public class Round {
     public Round() {
     }
 
-    public String getRoundId() {
+    public Long getRoundId() {
         return roundId;
     }
 
-    public void setRoundId(String roundId) {
+    public void setRoundId(Long roundId) {
         this.roundId = roundId;
     }
 
-    public String getGameId() {
+    public Long getGameId() {
         return gameId;
     }
 
-    public void setGameId(String gameId) {
+    public void setGameId(Long gameId) {
         this.gameId = gameId;
     }
 

@@ -7,9 +7,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface AnswerRepository extends CrudRepository<Answer, String> {
+public interface AnswerRepository extends CrudRepository<Answer, Long> {
     Optional<Answer> findByRoundIdAndQuestionIdAndPlayerId(
-            String roundId,
-            String questionId,
-            String playerId);
+            Long roundId,
+            Long questionId,
+            Long playerId);
 }

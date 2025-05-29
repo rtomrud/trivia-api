@@ -10,9 +10,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface QuestionRepository extends CrudRepository<Question, String> {
+public interface QuestionRepository extends CrudRepository<Question, Long> {
     @Query("SELECT questions.* FROM questions JOIN round_questions ON questions.question_id = round_questions.question_id WHERE round_questions.round_id = :roundId")
-    List<Question> findByRoundId(String roundId);
+    List<Question> findByRoundId(Long roundId);
 
     Page<Question> findByDifficulty(Integer difficulty, Pageable pageable);
 }
