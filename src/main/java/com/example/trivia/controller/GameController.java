@@ -1,5 +1,7 @@
 package com.example.trivia.controller;
 
+import com.example.trivia.dto.AnswerSubmissionRequest;
+import com.example.trivia.dto.GameCreationRequest;
 import com.example.trivia.model.*;
 import com.example.trivia.repository.*;
 
@@ -15,7 +17,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -48,25 +49,24 @@ public class GameController {
 
     @PostMapping("/games")
     public ResponseEntity<Game> createGame(
-            @RequestBody Map<String, Object> body,
+            @RequestBody GameCreationRequest request,
             HttpSession session) {
-        Long roomId = (Long) body.get("roomId");
-        Optional<Room> roomOptional = roomRepo.findById(roomId);
+        Optional<Room> roomOptional = roomRepo.findById(request.roomId());
         if (roomOptional.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
 
-        Player currentPlayer = (Player) session.getAttribute(roomId.toString());
+        Player currentPlayer = (Player) session.getAttribute(request.roomId().toString());
         if (currentPlayer == null || !currentPlayer.isHost()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         Game game = new Game();
-        game.setRoomId(roomId);
-        game.setRounds((Integer) body.get("rounds"));
-        game.setTimePerRound((Integer) body.get("timePerRound"));
-        game.setQuestionsPerRound((Integer) body.get("questionsPerRound"));
-        game.setDifficulty((Integer) body.get("difficulty"));
+        game.setRoomId(request.roomId());
+        game.setRounds(request.rounds());
+        game.setTimePerRound(request.timePerRound());
+        game.setQuestionsPerRound(request.questionsPerRound());
+        game.setDifficulty(request.difficulty());
         game.setCreatedAt(Instant.now());
         game.setEndedAt(game.getCreatedAt().plus(
                 Duration.ofSeconds(game.getRounds() * game.getTimePerRound())));
@@ -180,7 +180,7 @@ public class GameController {
             @PathVariable Long roundId,
             @PathVariable Long questionId,
             @PathVariable Long playerId,
-            @RequestBody Map<String, Object> body,
+            @RequestBody AnswerSubmissionRequest request,
             HttpSession session) {
         Optional<Game> gameOptional = gameRepo.findById(gameId);
         Optional<Round> roundOptional = roundRepo.findById(roundId);
@@ -211,8 +211,8 @@ public class GameController {
         answer.setRoundId(roundId);
         answer.setQuestionId(questionId);
         answer.setPlayerId(playerId);
+        answer.setAnswer(request.answer());
         answer.setCreatedAt(Instant.now());
-        answer.setAnswer((String) body.get("answer"));
 
         // Check if the submited answer is correct
         Question question = questionOptional.get();
