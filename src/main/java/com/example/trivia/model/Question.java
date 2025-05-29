@@ -9,11 +9,11 @@ import java.util.List;
 public class Question {
     @Id
     private Long questionId;
-    private String type; // "multiple_choice", "short_answer" or "buzzer"
+    private String type;
     private Integer difficulty;
     private String text;
     private String mediaUrl; // nullable
-    private List<String> options; // nullable if type is not multiple_choice
+    private List<String> options; // nullable
     private List<String> correctAnswers; // nullable
 
     public Question() {

@@ -571,7 +571,6 @@ components:
           type: string
         type:
           type: string
-          enum: [multiple_choice, short_answer, buzzer]
         difficulty:
           type: integer
           minimum: 0
