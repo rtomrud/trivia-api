@@ -282,6 +282,25 @@ paths:
           description: Room, team or player not found
 
   /games:
+    get:
+      summary: Get games
+      operationId: getGames
+      parameters:
+        - name: roomId
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Games retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Game"
+
     post:
       summary: Create a game with the players of a room
       operationId: createGame

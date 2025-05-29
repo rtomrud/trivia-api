@@ -47,6 +47,12 @@ public class GameController {
         this.roundRepo = roundRepo;
     }
 
+    @GetMapping("/games")
+    public ResponseEntity<List<Game>> getGames(@RequestParam(required = false) Long roomId) {
+        List<Game> games = gameRepo.findByRoomId(roomId);
+        return ResponseEntity.ok(games);
+    }
+
     @PostMapping("/games")
     public ResponseEntity<Game> createGame(
             @RequestBody GameCreationRequest request,
