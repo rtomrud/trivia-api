@@ -31,7 +31,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         "200":
           description: Room retrieved
@@ -50,7 +50,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         "204":
           description: Room deleted
@@ -68,7 +68,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       requestBody:
         required: true
         content:
@@ -99,7 +99,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         "200":
           description: Players retrieved
@@ -121,12 +121,12 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
         - name: playerId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         "204":
           description: Player deleted
@@ -144,7 +144,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         "201":
           description: Team created
@@ -163,7 +163,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         "200":
           description: Teams retrieved
@@ -185,12 +185,12 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
         - name: teamId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         "204":
           description: Team deleted
@@ -208,12 +208,12 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
         - name: teamId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         "200":
           description: Players retrieved
@@ -235,17 +235,17 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
         - name: teamId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
         - name: playerId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         "200":
           description: Player assigned to team
@@ -293,7 +293,7 @@ paths:
               type: object
               properties:
                 roomId:
-                  type: string
+                  type: integer
                 rounds:
                   type: integer
                   minimum: 1
@@ -329,7 +329,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         "200":
           description: Game retrieved
@@ -348,7 +348,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         "204":
           description: Game deleted
@@ -366,7 +366,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         "200":
           description: Rounds retrieved
@@ -388,12 +388,12 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
         - name: roundId
           in: path
           required: true
           schema:
-            type: number
+            type: integer
       responses:
         "200":
           description: Questions retrieved
@@ -415,7 +415,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
         - name: roundId
           in: path
           required: true
@@ -425,12 +425,12 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
         - name: playerId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       requestBody:
         required: true
         content:
@@ -460,22 +460,22 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
         - name: roundId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
         - name: questionId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
         - name: playerId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         "200":
           description: Answer retrieved
@@ -496,7 +496,7 @@ components:
       type: object
       properties:
         roomId:
-          type: string
+          type: integer
         createdAt:
           type: string
           format: date-time
@@ -505,17 +505,17 @@ components:
       type: object
       properties:
         teamId:
-          type: string
+          type: integer
         roomId:
-          type: string
+          type: integer
 
     Player:
       type: object
       properties:
         playerId:
-          type: string
+          type: integer
         roomId:
-          type: string
+          type: integer
         teamId:
           type: string
           nullable: true # null if player is not in a team
@@ -528,9 +528,9 @@ components:
       type: object
       properties:
         gameId:
-          type: string
+          type: integer
         roomId:
-          type: string
+          type: integer
         rounds:
           type: integer
           minimum: 1
@@ -554,9 +554,9 @@ components:
       type: object
       properties:
         roundId:
-          type: string
+          type: integer
         gameId:
-          type: string
+          type: integer
         createdAt:
           type: string
           format: date-time
@@ -568,7 +568,7 @@ components:
       type: object
       properties:
         questionId:
-          type: string
+          type: integer
         type:
           type: string
         difficulty:
@@ -594,15 +594,15 @@ components:
       type: object
       properties:
         answerId:
-          type: string
+          type: integer
         gameId:
-          type: string
+          type: integer
         roundId:
-          type: string
+          type: integer
         questionId:
-          type: string
+          type: integer
         playerId:
-          type: string
+          type: integer
         answer:
           type: string
         correct:
