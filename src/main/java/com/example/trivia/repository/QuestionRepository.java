@@ -1,6 +1,7 @@
 package com.example.trivia.repository;
 
 import com.example.trivia.model.Question;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jdbc.repository.query.Query;
