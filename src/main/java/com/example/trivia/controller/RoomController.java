@@ -1,5 +1,7 @@
 package com.example.trivia.controller;
 
+import com.example.trivia.dto.JoinRoomRequest;
+import com.example.trivia.dto.RoomCreationRequest;
 import com.example.trivia.model.*;
 import com.example.trivia.repository.*;
 
@@ -12,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -31,9 +32,10 @@ public class RoomController {
     }
 
     @PostMapping("/rooms")
-    public ResponseEntity<Room> createRoom() {
+    public ResponseEntity<Room> createRoom(@RequestBody RoomCreationRequest request) {
         Room room = new Room();
         room.setCreatedAt(Instant.now());
+        room.setCode(request.code());
         roomRepo.save(room);
 
         URI roomUrl = URI.create("/rooms/" + room.getRoomId());
@@ -65,16 +67,21 @@ public class RoomController {
     @PostMapping("/rooms/{roomId}/players")
     public ResponseEntity<Player> joinRoom(
             @PathVariable Long roomId,
-            @RequestBody Map<String, Object> body,
+            @RequestBody JoinRoomRequest request,
             HttpSession session) {
         Optional<Room> roomOptional = roomRepo.findById(roomId);
         if (roomOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
+        Room room = roomOptional.get();
+        if (!room.getCode().equals(request.code())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         Player player = new Player();
         player.setRoomId(roomId);
-        player.setUsername((String) body.get("username"));
+        player.setUsername(request.username());
         player.setHost(playerRepo.findByRoomId(roomId).isEmpty()); // first player to join is host
         playerRepo.save(player);
 

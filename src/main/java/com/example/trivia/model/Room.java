@@ -10,6 +10,7 @@ public class Room {
     @Id
     private Long roomId;
     private Instant createdAt;
+    private String code;
 
     public Room() {
     }
@@ -28,5 +29,13 @@ public class Room {
 
     public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 }

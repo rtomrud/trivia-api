@@ -14,7 +14,17 @@ paths:
     post:
       summary: Create a room
       operationId: createRoom
-      responses:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+              required:
+                - code
         "201":
           description: Room created
           content:
@@ -76,10 +86,13 @@ paths:
             schema:
               type: object
               properties:
+                code:
+                  type: string
                 username:
                   type: string
                   minLength: 3
               required:
+                - code
                 - username
       responses:
         "201":
@@ -519,6 +532,8 @@ components:
         createdAt:
           type: string
           format: date-time
+        code:
+          type: string
 
     Team:
       type: object
