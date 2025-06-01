@@ -10,11 +10,11 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URI;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 public class RoomController {
@@ -44,12 +44,9 @@ public class RoomController {
 
     @GetMapping("/rooms/{roomId}")
     public ResponseEntity<Room> getRoom(@PathVariable Long roomId) {
-        Optional<Room> roomOptional = roomRepo.findById(roomId);
-        if (roomOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
+        Room room = roomRepo.findById(roomId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
-        Room room = roomOptional.get();
         return ResponseEntity.ok(room);
     }
 
@@ -57,7 +54,7 @@ public class RoomController {
     public ResponseEntity<Void> deleteRoom(@PathVariable Long roomId, HttpSession session) {
         Player currentPlayer = (Player) session.getAttribute(roomId.toString());
         if (currentPlayer == null || !currentPlayer.isHost()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can delete a room");
         }
 
         roomRepo.deleteById(roomId);
@@ -69,14 +66,11 @@ public class RoomController {
             @PathVariable Long roomId,
             @RequestBody JoinRoomRequest request,
             HttpSession session) {
-        Optional<Room> roomOptional = roomRepo.findById(roomId);
-        if (roomOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
+        Room room = roomRepo.findById(roomId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
-        Room room = roomOptional.get();
         if (!room.getCode().equals(request.code())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid room code");
         }
 
         Player player = new Player();
@@ -93,10 +87,8 @@ public class RoomController {
 
     @GetMapping("/rooms/{roomId}/players")
     public ResponseEntity<List<Player>> getRoomPlayers(@PathVariable Long roomId) {
-        Optional<Room> roomOptional = roomRepo.findById(roomId);
-        if (roomOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
+        roomRepo.findById(roomId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
         List<Player> players = playerRepo.findByRoomId(roomId);
         return ResponseEntity.ok(players);
@@ -107,21 +99,16 @@ public class RoomController {
             @PathVariable Long roomId,
             @PathVariable Long playerId,
             HttpSession session) {
-        Optional<Room> roomOptional = roomRepo.findById(roomId);
-        if (roomOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
         Player currentPlayer = (Player) session.getAttribute(roomId.toString());
         if (currentPlayer == null
                 || !currentPlayer.isHost() && !currentPlayer.getPlayerId().equals(playerId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can delete another player");
         }
 
         playerRepo.deleteById(playerId);
 
         if (currentPlayer.getPlayerId().equals(playerId)) {
-        session.removeAttribute(roomId.toString());
+            session.removeAttribute(roomId.toString());
         }
 
         return ResponseEntity.noContent().build();
@@ -129,14 +116,12 @@ public class RoomController {
 
     @PostMapping("/rooms/{roomId}/teams")
     public ResponseEntity<Team> createTeam(@PathVariable Long roomId, HttpSession session) {
-        Optional<Room> roomOptional = roomRepo.findById(roomId);
-        if (roomOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
+        roomRepo.findById(roomId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
         Player currentPlayer = (Player) session.getAttribute(roomId.toString());
         if (currentPlayer == null || !currentPlayer.isHost()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can create a team");
         }
 
         Team team = new Team();
@@ -149,10 +134,8 @@ public class RoomController {
 
     @GetMapping("/rooms/{roomId}/teams")
     public ResponseEntity<List<Team>> getTeams(@PathVariable Long roomId) {
-        Optional<Room> roomOptional = roomRepo.findById(roomId);
-        if (roomOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
+        roomRepo.findById(roomId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
         List<Team> teams = teamRepo.findByRoomId(roomId);
         return ResponseEntity.ok(teams);
@@ -163,14 +146,12 @@ public class RoomController {
             @PathVariable Long roomId,
             @PathVariable Long teamId,
             HttpSession session) {
-        Optional<Room> roomOptional = roomRepo.findById(roomId);
-        if (roomOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
+        roomRepo.findById(roomId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
         Player currentPlayer = (Player) session.getAttribute(roomId.toString());
         if (currentPlayer == null || !currentPlayer.isHost()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can delete a team");
         }
 
         teamRepo.deleteById(teamId);
@@ -181,11 +162,11 @@ public class RoomController {
     public ResponseEntity<List<Player>> getTeamPlayers(
             @PathVariable Long roomId,
             @PathVariable Long teamId) {
-        Optional<Room> roomOptional = roomRepo.findById(roomId);
-        Optional<Team> teamOptional = teamRepo.findById(teamId);
-        if (roomOptional.isEmpty() || teamOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
+        roomRepo.findById(roomId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
+
+        teamRepo.findById(teamId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Team not found"));
 
         List<Player> players = playerRepo.findByTeamId(teamId);
         return ResponseEntity.ok(players);
@@ -197,22 +178,21 @@ public class RoomController {
             @PathVariable Long teamId,
             @PathVariable Long playerId,
             HttpSession session) {
-        Optional<Room> roomOptional = roomRepo.findById(roomId);
-        Optional<Team> teamOptional = teamRepo.findById(teamId);
-        Optional<Player> playerOptional = playerRepo.findById(playerId);
-        if (roomOptional.isEmpty()
-                || teamOptional.isEmpty()
-                || playerOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
+        roomRepo.findById(roomId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
         Player currentPlayer = (Player) session.getAttribute(roomId.toString());
         if (currentPlayer == null
                 || !currentPlayer.isHost() && !currentPlayer.getPlayerId().equals(playerId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can assign another player to a team");
         }
 
-        Player player = playerOptional.get();
+        teamRepo.findById(teamId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Team not found"));
+
+        Player player = playerRepo.findById(playerId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found"));
+
         player.setTeamId(teamId);
         playerRepo.save(player);
         return ResponseEntity.noContent().build();
@@ -224,22 +204,21 @@ public class RoomController {
             @PathVariable Long teamId,
             @PathVariable Long playerId,
             HttpSession session) {
-        Optional<Room> roomOptional = roomRepo.findById(roomId);
-        Optional<Team> teamOptional = teamRepo.findById(teamId);
-        Optional<Player> playerOptional = playerRepo.findById(playerId);
-        if (roomOptional.isEmpty()
-                || teamOptional.isEmpty()
-                || playerOptional.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
+        roomRepo.findById(roomId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
         Player currentPlayer = (Player) session.getAttribute(roomId.toString());
         if (currentPlayer == null
                 || !currentPlayer.isHost() && !currentPlayer.getPlayerId().equals(playerId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can remove another player from a team");
         }
 
-        Player player = playerOptional.get();
+        teamRepo.findById(teamId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Team not found"));
+
+        Player player = playerRepo.findById(playerId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found"));
+
         player.setTeamId(null);
         playerRepo.save(player);
         return ResponseEntity.noContent().build();
