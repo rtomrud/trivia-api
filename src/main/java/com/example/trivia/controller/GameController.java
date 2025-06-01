@@ -167,7 +167,7 @@ public class GameController {
         // Check if round has already started
         Round round = roundOptional.get();
         if (Instant.now().isBefore(round.getCreatedAt())) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         List<Question> questions = questionRepo.findByRoundId(roundId);
@@ -202,7 +202,7 @@ public class GameController {
         // Check if round has not ended yet
         Round round = roundOptional.get();
         if (Instant.now().isAfter(round.getEndedAt())) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         Game game = gameOptional.get();
@@ -260,7 +260,7 @@ public class GameController {
         // Check if round has already ended
         Round round = roundOptional.get();
         if (Instant.now().isBefore(round.getEndedAt())) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         Game game = gameOptional.get();
