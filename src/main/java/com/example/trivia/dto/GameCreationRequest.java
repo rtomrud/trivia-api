@@ -2,9 +2,9 @@ package com.example.trivia.dto;
 
 public record GameCreationRequest(
         Long roomId,
-        int rounds,
-        int timePerRound,
-        int questionsPerRound,
-        int difficulty
+        Integer rounds,
+        Integer timePerRound,
+        Integer questionsPerRound,
+        Integer difficulty
 ) {
 }

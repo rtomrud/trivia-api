@@ -33,7 +33,7 @@ public class Round {
         this.gameId = gameId;
     }
 
-    public int getRoundNumber() {
+    public Integer getRoundNumber() {
         return roundNumber;
     }
 
