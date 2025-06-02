@@ -199,18 +199,9 @@ public class GameController {
         answer.setPlayerId(currentPlayer.getPlayerId());
         answer.setAnswer(request.answer());
         answer.setCreatedAt(Instant.now());
-
-        boolean correct = false;
-        for (String correctAnswer : question.getCorrectAnswers()) {
-            if (answer.getAnswer().equalsIgnoreCase(correctAnswer)) {
-                correct = true;
-                break;
-            }
-        }
-
-        answer.setCorrect(correct);
+        answer.setCorrect(question.getCorrectAnswers().stream()
+            .anyMatch(correctAnswer -> answer.getAnswer().equalsIgnoreCase(correctAnswer)));
         answerRepo.save(answer);
-
         return ResponseEntity.ok().build();
     }
 
