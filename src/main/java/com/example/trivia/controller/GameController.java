@@ -4,6 +4,7 @@ import com.example.trivia.dto.AnswerSubmissionRequest;
 import com.example.trivia.dto.GameCreationRequest;
 import com.example.trivia.model.*;
 import com.example.trivia.repository.*;
+import com.example.trivia.model.Player;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -28,16 +29,19 @@ public class GameController {
     private final RoomRepository roomRepo;
     private final RoundQuestionRepository roundQuestionRepo;
     private final RoundRepository roundRepo;
+    private final PlayerRepository playerRepo;
 
     public GameController(
             AnswerRepository answerRepo,
             GameRepository gameRepo,
+            PlayerRepository playerRepo,
             QuestionRepository questionRepo,
             RoomRepository roomRepo,
             RoundQuestionRepository roundQuestionRepo,
             RoundRepository roundRepo) {
         this.answerRepo = answerRepo;
         this.gameRepo = gameRepo;
+        this.playerRepo = playerRepo;
         this.questionRepo = questionRepo;
         this.roomRepo = roomRepo;
         this.roundQuestionRepo = roundQuestionRepo;
@@ -57,8 +61,15 @@ public class GameController {
         roomRepo.findById(request.roomId())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid room id"));
 
-        Player currentPlayer = (Player) session.getAttribute(request.roomId().toString());
-        if (currentPlayer == null || !currentPlayer.isHost()) {
+        Long currentPlayerId = (Long) session.getAttribute(request.roomId().toString());
+        if (currentPlayerId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
+        }
+
+        Player currentPlayer = playerRepo.findById(currentPlayerId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated"));
+
+        if (!currentPlayer.isHost()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can create a game");
         }
 
@@ -122,9 +133,15 @@ public class GameController {
         Game game = gameRepo.findById(gameId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found"));
 
-        Long roomId = game.getRoomId();
-        Player currentPlayer = (Player) session.getAttribute(roomId.toString());
-        if (currentPlayer == null || !currentPlayer.isHost()) {
+        Long currentPlayerId = (Long) session.getAttribute(game.getRoomId().toString());
+        if (currentPlayerId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
+        }
+
+        Player currentPlayer = playerRepo.findById(currentPlayerId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated"));
+
+        if (!currentPlayer.isHost()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can delete the game");
         }
 
@@ -181,13 +198,19 @@ public class GameController {
         Question question = questionRepo.findById(questionId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found"));
 
+        Long currentPlayerId = (Long) session.getAttribute(game.getRoomId().toString());
+        if (currentPlayerId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
+        }
+
+        Player currentPlayer = playerRepo.findById(currentPlayerId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated"));
+
         if (Instant.now().isAfter(round.getEndedAt())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Round has already ended");
         }
 
-        Long roomId = game.getRoomId();
-        Player currentPlayer = (Player) session.getAttribute(roomId.toString());
-        if (currentPlayer == null || !currentPlayer.getRoomId().equals(roomId)) {
+        if (!currentPlayer.getRoomId().equals(game.getRoomId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Player is not in the room");
         }
 

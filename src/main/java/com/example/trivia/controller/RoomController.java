@@ -52,8 +52,15 @@ public class RoomController {
 
     @DeleteMapping("/rooms/{roomId}")
     public ResponseEntity<Void> deleteRoom(@PathVariable Long roomId, HttpSession session) {
-        Player currentPlayer = (Player) session.getAttribute(roomId.toString());
-        if (currentPlayer == null || !currentPlayer.isHost()) {
+        Long currentPlayerId = (Long) session.getAttribute(roomId.toString());
+        if (currentPlayerId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
+        }
+
+        Player currentPlayer = playerRepo.findById(currentPlayerId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated"));
+
+        if (!currentPlayer.isHost()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can delete a room");
         }
 
@@ -79,7 +86,7 @@ public class RoomController {
         player.setHost(playerRepo.findByRoomId(roomId).isEmpty()); // first player to join is host
         playerRepo.save(player);
 
-        session.setAttribute(roomId.toString(), player);
+        session.setAttribute(room.getRoomId().toString(), player.getPlayerId());
 
         URI location = URI.create("/rooms/" + roomId + "/players/" + player.getPlayerId());
         return ResponseEntity.created(location).body(player);
@@ -99,18 +106,23 @@ public class RoomController {
             @PathVariable Long roomId,
             @PathVariable Long playerId,
             HttpSession session) {
-        Player currentPlayer = (Player) session.getAttribute(roomId.toString());
-        if (currentPlayer == null
-                || (!currentPlayer.isHost() && !currentPlayer.getPlayerId().equals(playerId))) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can delete another player");
+        Long currentPlayerId = (Long) session.getAttribute(roomId.toString());
+        if (currentPlayerId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
         }
 
-        playerRepo.deleteById(playerId);
+        Player currentPlayer = playerRepo.findById(currentPlayerId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated"));
+
+        if (!currentPlayer.isHost() && !currentPlayer.getPlayerId().equals(playerId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can delete another player");
+        }
 
         if (currentPlayer.getPlayerId().equals(playerId)) {
             session.removeAttribute(roomId.toString());
         }
 
+        playerRepo.deleteById(playerId);
         return ResponseEntity.noContent().build();
     }
 
@@ -119,8 +131,15 @@ public class RoomController {
         roomRepo.findById(roomId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
-        Player currentPlayer = (Player) session.getAttribute(roomId.toString());
-        if (currentPlayer == null || !currentPlayer.isHost()) {
+        Long currentPlayerId = (Long) session.getAttribute(roomId.toString());
+        if (currentPlayerId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
+        }
+
+        Player currentPlayer = playerRepo.findById(currentPlayerId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated"));
+
+        if (!currentPlayer.isHost()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can create a team");
         }
 
@@ -149,8 +168,15 @@ public class RoomController {
         roomRepo.findById(roomId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
-        Player currentPlayer = (Player) session.getAttribute(roomId.toString());
-        if (currentPlayer == null || !currentPlayer.isHost()) {
+        Long currentPlayerId = (Long) session.getAttribute(roomId.toString());
+        if (currentPlayerId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
+        }
+
+        Player currentPlayer = playerRepo.findById(currentPlayerId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated"));
+
+        if (!currentPlayer.isHost()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can delete a team");
         }
 
@@ -187,9 +213,15 @@ public class RoomController {
         Player player = playerRepo.findById(playerId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found"));
 
-        Player currentPlayer = (Player) session.getAttribute(roomId.toString());
-        if (currentPlayer == null
-                || (!currentPlayer.isHost() && !currentPlayer.getPlayerId().equals(playerId))) {
+        Long currentUserId = (Long) session.getAttribute(roomId.toString());
+        if (currentUserId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
+        }
+
+        Player currentPlayer = playerRepo.findById(currentUserId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated"));
+
+        if (!currentPlayer.isHost() && !currentPlayer.getPlayerId().equals(player.getPlayerId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can assign another player to a team");
         }
 
@@ -213,9 +245,15 @@ public class RoomController {
         Player player = playerRepo.findById(playerId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found"));
 
-        Player currentPlayer = (Player) session.getAttribute(roomId.toString());
-        if (currentPlayer == null
-                || (!currentPlayer.isHost() && !currentPlayer.getPlayerId().equals(playerId))) {
+        Long currentPlayerId = (Long) session.getAttribute(roomId.toString());
+        if (currentPlayerId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
+        }
+
+        Player currentPlayer = playerRepo.findById(currentPlayerId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated"));
+
+        if (!currentPlayer.isHost() && !currentPlayer.getPlayerId().equals(player.getPlayerId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can remove another player from a team");
         }
 
