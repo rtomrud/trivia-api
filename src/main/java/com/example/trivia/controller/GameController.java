@@ -178,12 +178,12 @@ public class GameController {
         Round round = roundRepo.findById(roundId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Round not found"));
 
+        Question question = questionRepo.findById(questionId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found"));
+
         if (Instant.now().isAfter(round.getEndedAt())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Round has already ended");
         }
-
-        Question question = questionRepo.findById(questionId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found"));
 
         Long roomId = game.getRoomId();
         Player currentPlayer = (Player) session.getAttribute(roomId.toString());
@@ -215,12 +215,12 @@ public class GameController {
         Round round = roundRepo.findById(roundId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Round not found"));
 
+        questionRepo.findById(questionId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found"));
+
         if (Instant.now().isBefore(round.getEndedAt())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Round has not ended yet");
         }
-
-        questionRepo.findById(questionId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found"));
 
         List<Answer> answers = answerRepo.findByRoundIdAndQuestionId(roundId, questionId);
         return ResponseEntity.ok(answers);
