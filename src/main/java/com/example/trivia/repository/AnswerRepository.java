@@ -5,12 +5,9 @@ import com.example.trivia.model.Answer;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface AnswerRepository extends CrudRepository<Answer, Long> {
-    Optional<Answer> findByRoundIdAndQuestionIdAndPlayerId(
-            Long roundId,
-            Long questionId,
-            Long playerId);
+    List<Answer> findByRoundIdAndQuestionId(Long roundId, Long questionId);
 }

@@ -440,7 +440,7 @@ paths:
         "404":
           description: Game or round not found
 
-  /games/{gameId}/rounds/{roundId}/questions/{questionId}/players/{playerId}:
+  /games/{gameId}/rounds/{roundId}/questions/{questionId}:
     post:
       summary: Submit the answer to a question
       operationId: submitAnswer
@@ -460,11 +460,6 @@ paths:
           required: true
           schema:
             type: integer
-        - name: playerId
-          in: path
-          required: true
-          schema:
-            type: integer
       requestBody:
         required: true
         content:
@@ -479,14 +474,16 @@ paths:
       responses:
         "200":
           description: Answer submitted
+        "401":
+          description: Player is not in the room of this game
         "403":
           description: Round has already ended
         "404":
-          description: Game, round, question or player not found
+          description: Game, round or question not found
 
     get:
-      summary: Get the answer of a question
-      operationId: getAnswer
+      summary: Get the answers of a question
+      operationId: getAnswers
       parameters:
         - name: gameId
           in: path
@@ -503,14 +500,9 @@ paths:
           required: true
           schema:
             type: integer
-        - name: playerId
-          in: path
-          required: true
-          schema:
-            type: integer
       responses:
         "200":
-          description: Answer retrieved
+          description: Answers retrieved
           content:
             application/json:
               schema:
@@ -518,7 +510,7 @@ paths:
         "403":
           description: Round has not ended yet
         "404":
-          description: Game, round, question, player or answer not found
+          description: Game, round, question or answer not found
 
 components:
   schemas:

@@ -24,7 +24,6 @@ import java.util.Set;
 public class GameController {
     private final AnswerRepository answerRepo;
     private final GameRepository gameRepo;
-    private final PlayerRepository playerRepo;
     private final QuestionRepository questionRepo;
     private final RoomRepository roomRepo;
     private final RoundQuestionRepository roundQuestionRepo;
@@ -33,14 +32,12 @@ public class GameController {
     public GameController(
             AnswerRepository answerRepo,
             GameRepository gameRepo,
-            PlayerRepository playerRepo,
             QuestionRepository questionRepo,
             RoomRepository roomRepo,
             RoundQuestionRepository roundQuestionRepo,
             RoundRepository roundRepo) {
         this.answerRepo = answerRepo;
         this.gameRepo = gameRepo;
-        this.playerRepo = playerRepo;
         this.questionRepo = questionRepo;
         this.roomRepo = roomRepo;
         this.roundQuestionRepo = roundQuestionRepo;
@@ -169,12 +166,11 @@ public class GameController {
         return ResponseEntity.ok(questions);
     }
 
-    @PostMapping("/games/{gameId}/rounds/{roundId}/questions/{questionId}/players/{playerId}")
+    @PostMapping("/games/{gameId}/rounds/{roundId}/questions/{questionId}")
     public ResponseEntity<Void> submitAnswer(
             @PathVariable Long gameId,
             @PathVariable Long roundId,
             @PathVariable Long questionId,
-            @PathVariable Long playerId,
             @RequestBody AnswerSubmissionRequest request,
             HttpSession session) {
         Game game = gameRepo.findById(gameId)
@@ -183,32 +179,27 @@ public class GameController {
         Round round = roundRepo.findById(roundId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Round not found"));
 
-        Question question = questionRepo.findById(questionId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found"));
-
-        playerRepo.findById(playerId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found"));
-
-        // Check if round has not ended yet
         if (Instant.now().isAfter(round.getEndedAt())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Round has already ended");
         }
 
+        Question question = questionRepo.findById(questionId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found"));
+
         Long roomId = game.getRoomId();
         Player currentPlayer = (Player) session.getAttribute(roomId.toString());
-        if (currentPlayer == null || !currentPlayer.getPlayerId().equals(playerId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "A player cannot submit an answer for another player");
+        if (currentPlayer == null || !currentPlayer.getRoomId().equals(roomId)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player is not in the room of this game");
         }
 
         Answer answer = new Answer();
         answer.setGameId(gameId);
         answer.setRoundId(roundId);
         answer.setQuestionId(questionId);
-        answer.setPlayerId(playerId);
+        answer.setPlayerId(currentPlayer.getPlayerId());
         answer.setAnswer(request.answer());
         answer.setCreatedAt(Instant.now());
 
-        // Check if the submited answer is correct
         boolean correct = false;
         for (String correctAnswer : question.getCorrectAnswers()) {
             if (answer.getAnswer().equalsIgnoreCase(correctAnswer)) {
@@ -223,40 +214,25 @@ public class GameController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/games/{gameId}/rounds/{roundId}/questions/{questionId}/players/{playerId}")
-    public ResponseEntity<Answer> getAnswer(
+    @GetMapping("/games/{gameId}/rounds/{roundId}/questions/{questionId}")
+    public ResponseEntity<List<Answer>> getAnswers(
             @PathVariable Long gameId,
             @PathVariable Long roundId,
-            @PathVariable Long questionId,
-            @PathVariable Long playerId,
-            HttpSession session) {
-        Game game = gameRepo.findById(gameId)
+            @PathVariable Long questionId) {
+        gameRepo.findById(gameId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found"));
 
         Round round = roundRepo.findById(roundId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Round not found"));
 
-        questionRepo.findById(questionId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found"));
-
-        playerRepo.findById(playerId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found"));
-
-        Answer answer = answerRepo
-                .findByRoundIdAndQuestionIdAndPlayerId(roundId, questionId, playerId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Answer not found"));
-
-        // Check if round has already ended
         if (Instant.now().isBefore(round.getEndedAt())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Round has not ended yet");
         }
 
-        Long roomId = game.getRoomId();
-        Player currentPlayer = (Player) session.getAttribute(roomId.toString());
-        if (currentPlayer == null || !currentPlayer.getRoomId().equals(roomId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only a player in the same room can see the submitted answers");
-        }
+        questionRepo.findById(questionId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found"));
 
-        return ResponseEntity.ok(answer);
+        List<Answer> answers = answerRepo.findByRoundIdAndQuestionId(roundId, questionId);
+        return ResponseEntity.ok(answers);
     }
 }
