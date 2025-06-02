@@ -151,7 +151,6 @@ public class GameController {
         Round round = roundRepo.findById(roundId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Round not found"));
 
-        // Check if round has already started
         if (Instant.now().isBefore(round.getCreatedAt())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Round has not started yet");
         }

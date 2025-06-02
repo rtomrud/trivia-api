@@ -101,7 +101,7 @@ public class RoomController {
             HttpSession session) {
         Player currentPlayer = (Player) session.getAttribute(roomId.toString());
         if (currentPlayer == null
-                || !currentPlayer.isHost() && !currentPlayer.getPlayerId().equals(playerId)) {
+                || (!currentPlayer.isHost() && !currentPlayer.getPlayerId().equals(playerId))) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can delete another player");
         }
 
@@ -181,17 +181,17 @@ public class RoomController {
         roomRepo.findById(roomId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
-        Player currentPlayer = (Player) session.getAttribute(roomId.toString());
-        if (currentPlayer == null
-                || !currentPlayer.isHost() && !currentPlayer.getPlayerId().equals(playerId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can assign another player to a team");
-        }
-
         teamRepo.findById(teamId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Team not found"));
 
         Player player = playerRepo.findById(playerId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found"));
+
+        Player currentPlayer = (Player) session.getAttribute(roomId.toString());
+        if (currentPlayer == null
+                || (!currentPlayer.isHost() && !currentPlayer.getPlayerId().equals(playerId))) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can assign another player to a team");
+        }
 
         player.setTeamId(teamId);
         playerRepo.save(player);
@@ -207,17 +207,17 @@ public class RoomController {
         roomRepo.findById(roomId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
-        Player currentPlayer = (Player) session.getAttribute(roomId.toString());
-        if (currentPlayer == null
-                || !currentPlayer.isHost() && !currentPlayer.getPlayerId().equals(playerId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can remove another player from a team");
-        }
-
         teamRepo.findById(teamId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Team not found"));
 
         Player player = playerRepo.findById(playerId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found"));
+
+        Player currentPlayer = (Player) session.getAttribute(roomId.toString());
+        if (currentPlayer == null
+                || (!currentPlayer.isHost() && !currentPlayer.getPlayerId().equals(playerId))) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can remove another player from a team");
+        }
 
         player.setTeamId(null);
         playerRepo.save(player);
