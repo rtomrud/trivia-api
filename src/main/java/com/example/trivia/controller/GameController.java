@@ -2,9 +2,19 @@ package com.example.trivia.controller;
 
 import com.example.trivia.dto.AnswerSubmissionRequest;
 import com.example.trivia.dto.GameCreationRequest;
-import com.example.trivia.model.*;
-import com.example.trivia.repository.*;
+import com.example.trivia.model.Answer;
+import com.example.trivia.model.Game;
 import com.example.trivia.model.Player;
+import com.example.trivia.model.Question;
+import com.example.trivia.model.Round;
+import com.example.trivia.model.RoundQuestion;
+import com.example.trivia.repository.AnswerRepository;
+import com.example.trivia.repository.GameRepository;
+import com.example.trivia.repository.PlayerRepository;
+import com.example.trivia.repository.QuestionRepository;
+import com.example.trivia.repository.RoomRepository;
+import com.example.trivia.repository.RoundQuestionRepository;
+import com.example.trivia.repository.RoundRepository;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -26,11 +36,11 @@ import java.util.Set;
 public class GameController {
     private final AnswerRepository answerRepo;
     private final GameRepository gameRepo;
+    private final PlayerRepository playerRepo;
     private final QuestionRepository questionRepo;
     private final RoomRepository roomRepo;
     private final RoundQuestionRepository roundQuestionRepo;
     private final RoundRepository roundRepo;
-    private final PlayerRepository playerRepo;
 
     public GameController(
             AnswerRepository answerRepo,
