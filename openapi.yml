@@ -65,7 +65,7 @@ paths:
         "204":
           description: Room deleted
         "403":
-          description: Only the host can delete the room
+          description: Only the host can delete a room
         "404":
           description: Room not found
 
@@ -123,7 +123,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/Player"
         "404":
-          description: Room or player not found
+          description: Room not found
 
   /rooms/{roomId}/players/{playerId}:
     delete:
@@ -263,7 +263,7 @@ paths:
         "200":
           description: Player assigned to team
         "403":
-          description: Invalid team assignment
+          description: Only the host can assign another player to a team
         "404":
           description: Room, team or player not found
 
@@ -348,7 +348,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Game"
         "400":
-          description: Invalid room
+          description: Invalid room id
         "403":
           description: Only the host can create a game
 
@@ -385,7 +385,7 @@ paths:
         "204":
           description: Game deleted
         "403":
-          description: Only the host can end the game
+          description: Only the host can delete the game
         "404":
           description: Game not found
 
@@ -435,6 +435,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Question"
+        "403":
+          description: Round has not started yet
         "404":
           description: Game or round not found
 
@@ -477,10 +479,8 @@ paths:
       responses:
         "200":
           description: Answer submitted
-        "400":
-          description: Round has already ended
         "403":
-          description: Unauthorized
+          description: Round has already ended
         "404":
           description: Game, round, question or player not found
 
@@ -515,12 +515,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Answer"
-        "400":
-          description: Round has not ended yet
         "403":
-          description: Unauthorized
+          description: Round has not ended yet
         "404":
-          description: Game, round, question or player not found
+          description: Game, round, question, player or answer not found
 
 components:
   schemas:
