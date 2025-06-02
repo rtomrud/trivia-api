@@ -316,6 +316,18 @@ paths:
           required: false
           schema:
             type: integer
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
       responses:
         "200":
           description: Games retrieved

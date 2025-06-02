@@ -49,8 +49,16 @@ public class GameController {
     }
 
     @GetMapping("/games")
-    public ResponseEntity<List<Game>> getGames(@RequestParam(required = false) Long roomId) {
-        List<Game> games = gameRepo.findByRoomId(roomId);
+    public ResponseEntity<List<Game>> getGames(
+            @RequestParam(required = false) Long roomId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        if (roomId != null) {
+            List<Game> games = gameRepo.findByRoomId(roomId, PageRequest.of(page, size)).toList();
+            return ResponseEntity.ok(games);
+        }
+
+        List<Game> games = gameRepo.findAll(PageRequest.of(page, size)).toList();
         return ResponseEntity.ok(games);
     }
 
