@@ -64,6 +64,8 @@ paths:
       responses:
         "204":
           description: Room deleted
+        "401":
+          description: Player not authenticated
         "403":
           description: Only the host can delete a room
         "404":
@@ -145,6 +147,8 @@ paths:
       responses:
         "204":
           description: Player deleted
+        "401":
+          description: Player not authenticated
         "403":
           description: Only the host can delete another player
         "404":
@@ -167,6 +171,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Team"
+        "401":
+          description: Player not authenticated
+        "403":
+          description: Only the host can create a team
         "404":
           description: Room not found
 
@@ -264,6 +272,8 @@ paths:
       responses:
         "200":
           description: Player assigned to team
+        "401":
+          description: Player not authenticated
         "403":
           description: Only the host can assign another player to a team
         "404":
@@ -351,6 +361,8 @@ paths:
                 $ref: "#/components/schemas/Game"
         "400":
           description: Invalid room id
+        "401":
+          description: Player not authenticated
         "403":
           description: Only the host can create a game
 
@@ -386,6 +398,8 @@ paths:
       responses:
         "204":
           description: Game deleted
+        "401":
+          description: Player not authenticated
         "403":
           description: Only the host can delete the game
         "404":
@@ -476,6 +490,8 @@ paths:
       responses:
         "200":
           description: Answer submitted
+        "401":
+          description: Player not authenticated
         "403":
           description: Round has already ended or player is not in the room
         "404":
