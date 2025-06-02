@@ -584,24 +584,15 @@ components:
           type: integer
         roomId:
           type: integer
-        rounds:
-          type: integer
-          minimum: 1
-        timePerRound:
-          type: integer
-          minimum: 10
-        questionsPerRound:
-          type: integer
-          minimum: 1
-        difficulty:
-          type: integer
-          minimum: 0
         createdAt:
           type: string
           format: date-time
         endedAt:
           type: string
           format: date-time
+        roundCount:
+          type: integer
+          minimum: 1
 
     Round:
       type: object
@@ -616,6 +607,9 @@ components:
         endedAt:
           type: string
           format: date-time
+        questionCount:
+          type: integer
+          minimum: 1
 
     Question:
       type: object

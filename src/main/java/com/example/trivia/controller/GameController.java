@@ -83,7 +83,7 @@ public class GameController {
             @RequestBody GameCreationRequest request,
             HttpSession session) {
         roomRepo.findById(request.roomId())
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid room id"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid room id"));
 
         Long currentPlayerId = (Long) session.getAttribute(request.roomId().toString());
         if (currentPlayerId == null) {
@@ -91,7 +91,7 @@ public class GameController {
         }
 
         Player currentPlayer = playerRepo.findById(currentPlayerId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated"));
 
         if (!currentPlayer.isHost()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can create a game");
@@ -99,33 +99,31 @@ public class GameController {
 
         Game game = new Game();
         game.setRoomId(request.roomId());
-        game.setRounds(request.rounds());
-        game.setTimePerRound(request.timePerRound());
-        game.setQuestionsPerRound(request.questionsPerRound());
-        game.setDifficulty(request.difficulty());
+        game.setRoundCount(request.rounds());
         game.setCreatedAt(Instant.now());
         game.setEndedAt(game.getCreatedAt().plus(
-                Duration.ofSeconds(game.getRounds() * game.getTimePerRound())));
+                Duration.ofSeconds(request.rounds() * request.timePerRound())));
         gameRepo.save(game);
 
         // Create rounds and questions for the game, based on the game's settings
         Set<Long> questionIds = new HashSet<>();
         long count = questionRepo.count();
-        for (int roundNumber = 1; roundNumber <= game.getRounds(); roundNumber++) {
+        for (int roundNumber = 1; roundNumber <= request.rounds(); roundNumber++) {
             Round round = new Round();
             round.setGameId(game.getGameId());
             round.setRoundNumber(roundNumber);
             round.setCreatedAt(Instant.now().plus(
-                    Duration.ofSeconds(game.getTimePerRound() * (roundNumber - 1))));
+                    Duration.ofSeconds(request.timePerRound() * (roundNumber - 1))));
             round.setEndedAt(round.getCreatedAt().plus(
-                    Duration.ofSeconds(game.getTimePerRound())));
+                    Duration.ofSeconds(request.timePerRound())));
+            round.setQuestionCount(request.questionsPerRound());
             roundRepo.save(round);
 
-            for (int questionNumber = 1; questionNumber <= game.getQuestionsPerRound(); questionNumber++) {
+            for (int questionNumber = 1; questionNumber <= request.questionsPerRound(); questionNumber++) {
                 // Find a random question, based on the game's settings
                 Question question = null;
                 while (question == null || questionIds.contains(question.getQuestionId())) {
-                    question = questionRepo.findByDifficulty(game.getDifficulty(),
+                    question = questionRepo.findByDifficulty(request.difficulty(),
                             PageRequest.of((int) (Math.random() * count), 1))
                             .getContent().get(0);
                 }

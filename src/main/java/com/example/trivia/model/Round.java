@@ -13,6 +13,7 @@ public class Round {
     private Integer roundNumber;
     private Instant createdAt;
     private Instant endedAt;
+    private Integer questionCount;
 
     public Round() {
     }
@@ -55,5 +56,13 @@ public class Round {
 
     public void setEndedAt(Instant endedAt) {
         this.endedAt = endedAt;
+    }
+
+    public Integer getQuestionCount() {
+        return questionCount;
+    }
+
+    public void setQuestionCount(Integer questionCount) {
+        this.questionCount = questionCount;
     }
 }

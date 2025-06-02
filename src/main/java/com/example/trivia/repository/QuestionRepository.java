@@ -16,4 +16,6 @@ public interface QuestionRepository extends CrudRepository<Question, Long> {
     List<Question> findByRoundId(Long roundId);
 
     Page<Question> findByDifficulty(Integer difficulty, Pageable pageable);
+
+    Page<Question> findByDifficultyAndType(Integer difficulty, String type, Pageable pageable);
 }
