@@ -101,6 +101,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Player"
+        "400":
+          description: Invalid room code
         "404":
           description: Room not found
 
@@ -474,10 +476,8 @@ paths:
       responses:
         "200":
           description: Answer submitted
-        "401":
-          description: Player is not in the room of this game
         "403":
-          description: Round has already ended
+          description: Round has already ended or player is not in the room
         "404":
           description: Game, round or question not found
 

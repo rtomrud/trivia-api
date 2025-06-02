@@ -70,7 +70,7 @@ public class RoomController {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
         if (!room.getCode().equals(request.code())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid room code");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid room code");
         }
 
         Player player = new Player();

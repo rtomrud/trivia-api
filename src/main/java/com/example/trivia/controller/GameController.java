@@ -188,7 +188,7 @@ public class GameController {
         Long roomId = game.getRoomId();
         Player currentPlayer = (Player) session.getAttribute(roomId.toString());
         if (currentPlayer == null || !currentPlayer.getRoomId().equals(roomId)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player is not in the room of this game");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Player is not in the room");
         }
 
         Answer answer = new Answer();
