@@ -127,6 +127,18 @@ public class RoomController {
         }
 
         playerRepo.deleteById(playerId);
+
+        if (currentPlayer.isHost()) {
+            playerRepo.findByRoomId(roomId)
+                .stream()
+                .filter(player -> !player.getPlayerId().equals(playerId))
+                .findFirst()
+                .ifPresent(player -> {
+                    player.setHost(true);
+                    playerRepo.save(player);
+                });
+        }
+
         return ResponseEntity.noContent().build();
     }
 
