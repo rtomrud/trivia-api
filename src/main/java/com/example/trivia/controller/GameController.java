@@ -19,7 +19,7 @@ import com.example.trivia.repository.RoundRepository;
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -64,17 +64,13 @@ public class GameController {
             @RequestParam(required = false) Long roomId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
         if (roomId != null) {
-            List<Game> games = gameRepo.findByRoomId(
-                    roomId,
-                    PageRequest.of(page, size),
-                    Sort.by("createdAt").descending()).toList();
+            List<Game> games = gameRepo.findByRoomId(roomId, pageable).toList();
             return ResponseEntity.ok(games);
         }
 
-        List<Game> games = gameRepo.findAll(
-                PageRequest.of(page, size),
-                Sort.by("createdAt").descending()).toList();
+        List<Game> games = gameRepo.findAll(pageable).toList();
         return ResponseEntity.ok(games);
     }
 
