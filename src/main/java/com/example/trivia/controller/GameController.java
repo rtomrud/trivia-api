@@ -18,12 +18,14 @@ import com.example.trivia.repository.RoundRepository;
 
 import jakarta.servlet.http.HttpSession;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.time.Duration;
@@ -65,13 +67,13 @@ public class GameController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        if (roomId != null) {
-            List<Game> games = gameRepo.findByRoomId(roomId, pageable).toList();
-            return ResponseEntity.ok(games);
-        }
+        Page<Game> games = roomId != null
+                ? gameRepo.findByRoomId(roomId, pageable)
+                : gameRepo.findAll(pageable);
 
-        List<Game> games = gameRepo.findAll(pageable).toList();
-        return ResponseEntity.ok(games);
+        return ResponseEntity.ok()
+                .header("Link", buildLinkHeader(games, page, size))
+                .body(games.toList());
     }
 
     @PostMapping("/games")
@@ -141,7 +143,7 @@ public class GameController {
     @GetMapping("/games/{gameId}")
     public ResponseEntity<Game> getGame(@PathVariable Long gameId) {
         Game game = gameRepo.findById(gameId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found"));
 
         return ResponseEntity.ok(game);
     }
@@ -149,7 +151,7 @@ public class GameController {
     @DeleteMapping("/games/{gameId}")
     public ResponseEntity<Void> deleteGame(@PathVariable Long gameId, HttpSession session) {
         Game game = gameRepo.findById(gameId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found"));
 
         Long currentPlayerId = (Long) session.getAttribute(game.getRoomId().toString());
         if (currentPlayerId == null) {
@@ -157,7 +159,7 @@ public class GameController {
         }
 
         Player currentPlayer = playerRepo.findById(currentPlayerId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated"));
 
         if (!currentPlayer.isHost()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can delete the game");
@@ -170,7 +172,7 @@ public class GameController {
     @GetMapping("/games/{gameId}/rounds")
     public ResponseEntity<List<Round>> getRounds(@PathVariable Long gameId) {
         gameRepo.findById(gameId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found"));
 
         List<Round> rounds = roundRepo.findByGameId(gameId);
         return ResponseEntity.ok(rounds);
@@ -181,10 +183,10 @@ public class GameController {
             @PathVariable Long gameId,
             @PathVariable Long roundId) {
         gameRepo.findById(gameId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found"));
 
         Round round = roundRepo.findById(roundId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Round not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Round not found"));
 
         if (Instant.now().isBefore(round.getCreatedAt())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Round has not started yet");
@@ -208,13 +210,13 @@ public class GameController {
             @RequestBody AnswerSubmissionRequest request,
             HttpSession session) {
         Game game = gameRepo.findById(gameId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found"));
 
         Round round = roundRepo.findById(roundId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Round not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Round not found"));
 
         Question question = questionRepo.findById(questionId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found"));
 
         Long currentPlayerId = (Long) session.getAttribute(game.getRoomId().toString());
         if (currentPlayerId == null) {
@@ -222,7 +224,7 @@ public class GameController {
         }
 
         Player currentPlayer = playerRepo.findById(currentPlayerId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated"));
 
         if (Instant.now().isAfter(round.getEndedAt())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Round has already ended");
@@ -240,7 +242,7 @@ public class GameController {
         answer.setAnswer(request.answer());
         answer.setCreatedAt(Instant.now());
         answer.setCorrect(question.getCorrectAnswers().stream()
-            .anyMatch(correctAnswer -> answer.getAnswer().equalsIgnoreCase(correctAnswer)));
+                .anyMatch(correctAnswer -> answer.getAnswer().equalsIgnoreCase(correctAnswer)));
         answerRepo.save(answer);
         return ResponseEntity.ok().build();
     }
@@ -251,13 +253,13 @@ public class GameController {
             @PathVariable Long roundId,
             @PathVariable Long questionId) {
         gameRepo.findById(gameId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found"));
 
         Round round = roundRepo.findById(roundId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Round not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Round not found"));
 
         questionRepo.findById(questionId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found"));
 
         if (Instant.now().isBefore(round.getEndedAt())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Round has not ended yet");
@@ -265,5 +267,41 @@ public class GameController {
 
         List<Answer> answers = answerRepo.findByRoundIdAndQuestionId(roundId, questionId);
         return ResponseEntity.ok(answers);
+    }
+
+    private String buildLinkHeader(Page<?> entityPage, int page, int size) {
+        ServletUriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentRequest();
+        StringBuilder linkHeader = new StringBuilder();
+
+        String selfLink = builder.replaceQueryParam("page", page)
+                .replaceQueryParam("size", size)
+                .toUriString();
+        linkHeader.append(String.format("<%s>; rel=\"self\"", selfLink));
+
+        if (entityPage.hasNext()) {
+            String nextLink = builder.replaceQueryParam("page", page + 1)
+                    .replaceQueryParam("size", size)
+                    .toUriString();
+            linkHeader.append(", ").append(String.format("<%s>; rel=\"next\"", nextLink));
+        }
+
+        if (entityPage.hasPrevious()) {
+            String prevLink = builder.replaceQueryParam("page", page - 1)
+                    .replaceQueryParam("size", size)
+                    .toUriString();
+            linkHeader.append(", ").append(String.format("<%s>; rel=\"prev\"", prevLink));
+        }
+
+        String firstLink = builder.replaceQueryParam("page", 0)
+                .replaceQueryParam("size", size)
+                .toUriString();
+        linkHeader.append(", ").append(String.format("<%s>; rel=\"first\"", firstLink));
+
+        String lastLink = builder.replaceQueryParam("page", entityPage.getTotalPages() - 1)
+                .replaceQueryParam("size", size)
+                .toUriString();
+        linkHeader.append(", ").append(String.format("<%s>; rel=\"last\"", lastLink));
+
+        return linkHeader.toString();
     }
 }
