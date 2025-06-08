@@ -616,7 +616,7 @@ components:
           type: integer
         type:
           type: string
-        text:
+        question:
           type: string
         mediaUrl:
           type: string

@@ -10,7 +10,7 @@ public class Question {
     @Id
     private Long questionId;
     private String type;
-    private String text;
+    private String question;
     private String mediaUrl; // nullable
     private List<String> options; // nullable
     private List<String> correctAnswers; // nullable
@@ -34,12 +34,12 @@ public class Question {
         this.type = type;
     }
 
-    public String getText() {
-        return text;
+    public String getQuestion() {
+        return question;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setQuestion(String question) {
+        this.question = question;
     }
 
     public String getMediaUrl() {
