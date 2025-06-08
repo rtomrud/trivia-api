@@ -40,7 +40,7 @@ public class RoomController {
         Room room = new Room();
         room.setCreatedAt(Instant.now());
         room.setCode(request.code());
-        roomRepo.save(room);
+        room = roomRepo.save(room);
 
         URI roomUrl = URI.create("/rooms/" + room.getRoomId());
         return ResponseEntity.created(roomUrl).body(room);
@@ -87,7 +87,7 @@ public class RoomController {
         Player player = new Player();
         player.setRoomId(roomId);
         player.setUsername(request.username());
-        playerRepo.save(player);
+        player = playerRepo.save(player);
 
         // First player to join becomes the host
         if (playerRepo.findByRoomId(roomId).size() == 1) {
@@ -163,7 +163,7 @@ public class RoomController {
 
         Team team = new Team();
         team.setRoomId(roomId);
-        teamRepo.save(team);
+        team = teamRepo.save(team);
 
         URI location = URI.create("/rooms/" + roomId + "/teams/" + team.getTeamId());
         return ResponseEntity.created(location).body(team);

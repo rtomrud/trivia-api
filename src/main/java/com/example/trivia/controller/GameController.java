@@ -95,7 +95,7 @@ public class GameController {
         game.setRoomId(request.roomId());
         game.setCreatedAt(Instant.now());
         game.setEndedAt(game.getCreatedAt().plus(Duration.ofSeconds(request.rounds() * request.timePerRound())));
-        gameRepo.save(game);
+        game = gameRepo.save(game);
 
         // Create rounds and questions for the game, based on the game's settings
         Set<Long> questionIds = new HashSet<>();
@@ -106,7 +106,7 @@ public class GameController {
             round.setRoundNumber(roundNumber);
             round.setCreatedAt(Instant.now().plus(Duration.ofSeconds(request.timePerRound() * (roundNumber - 1))));
             round.setEndedAt(round.getCreatedAt().plus(Duration.ofSeconds(request.timePerRound())));
-            roundRepo.save(round);
+            round = roundRepo.save(round);
 
             for (int questionNumber = 1; questionNumber <= request.questionsPerRound(); questionNumber++) {
                 // Find a random question, based on the game's settings
