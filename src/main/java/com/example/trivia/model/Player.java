@@ -10,7 +10,6 @@ public class Player {
     private Long roomId;
     private Long teamId; // nullable (not assigned by default)
     private String username;
-    private Boolean host;
 
     public Player() {
     }
@@ -45,13 +44,5 @@ public class Player {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public Boolean isHost() {
-        return host;
-    }
-
-    public void setHost(Boolean host) {
-        this.host = host;
     }
 }

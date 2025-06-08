@@ -9,6 +9,7 @@ import java.time.Instant;
 public class Room {
     @Id
     private Long roomId;
+    private Long hostId;
     private Instant createdAt;
     private String code;
 
@@ -21,6 +22,14 @@ public class Room {
 
     public void setRoomId(Long roomId) {
         this.roomId = roomId;
+    }
+
+    public Long getHostId() {
+        return hostId;
+    }
+
+    public void setHostId(Long hostId) {
+        this.hostId = hostId;
     }
 
     public Instant getCreatedAt() {

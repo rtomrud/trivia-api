@@ -6,6 +6,7 @@ import com.example.trivia.model.Answer;
 import com.example.trivia.model.Game;
 import com.example.trivia.model.Player;
 import com.example.trivia.model.Question;
+import com.example.trivia.model.Room;
 import com.example.trivia.model.Round;
 import com.example.trivia.model.RoundQuestion;
 import com.example.trivia.repository.AnswerRepository;
@@ -78,7 +79,7 @@ public class GameController {
 
     @PostMapping("/games")
     public ResponseEntity<Game> createGame(@RequestBody GameCreationRequest request, HttpSession session) {
-        roomRepo.findById(request.roomId())
+        Room room = roomRepo.findById(request.roomId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid room id"));
 
         Long currentPlayerId = (Long) session.getAttribute(request.roomId().toString());
@@ -86,10 +87,7 @@ public class GameController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
         }
 
-        Player currentPlayer = playerRepo.findById(currentPlayerId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated"));
-
-        if (!currentPlayer.isHost()) {
+        if (!room.getHostId().equals(currentPlayerId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can create a game");
         }
 
@@ -145,15 +143,15 @@ public class GameController {
         Game game = gameRepo.findById(gameId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found"));
 
-        Long currentPlayerId = (Long) session.getAttribute(game.getRoomId().toString());
+        Room room = roomRepo.findById(game.getRoomId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
+
+        Long currentPlayerId = (Long) session.getAttribute(room.getRoomId().toString());
         if (currentPlayerId == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
         }
 
-        Player currentPlayer = playerRepo.findById(currentPlayerId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated"));
-
-        if (!currentPlayer.isHost()) {
+        if (!room.getHostId().equals(currentPlayerId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can delete the game");
         }
 

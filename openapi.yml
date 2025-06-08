@@ -545,6 +545,9 @@ components:
       properties:
         roomId:
           type: integer
+        hostId:
+          type: integer
+          nullable: true # null if no host in the room
         createdAt:
           type: string
           format: date-time
@@ -571,8 +574,6 @@ components:
           nullable: true # null if player is not in a team
         username:
           type: string
-        host:
-          type: boolean
 
     Game:
       type: object
