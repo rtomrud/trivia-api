@@ -12,7 +12,6 @@ public class Game {
     private Long roomId;
     private Instant createdAt;
     private Instant endedAt;
-    private Integer roundCount;
 
     public Game() {
     }
@@ -47,13 +46,5 @@ public class Game {
 
     public void setEndedAt(Instant endedAt) {
         this.endedAt = endedAt;
-    }
-
-    public Integer getRoundCount() {
-        return roundCount;
-    }
-
-    public void setRoundCount(Integer roundCount) {
-        this.roundCount = roundCount;
     }
 }

@@ -95,7 +95,6 @@ public class GameController {
 
         Game game = new Game();
         game.setRoomId(request.roomId());
-        game.setRoundCount(request.rounds());
         game.setCreatedAt(Instant.now());
         game.setEndedAt(game.getCreatedAt().plus(Duration.ofSeconds(request.rounds() * request.timePerRound())));
         gameRepo.save(game);
@@ -109,7 +108,6 @@ public class GameController {
             round.setRoundNumber(roundNumber);
             round.setCreatedAt(Instant.now().plus(Duration.ofSeconds(request.timePerRound() * (roundNumber - 1))));
             round.setEndedAt(round.getCreatedAt().plus(Duration.ofSeconds(request.timePerRound())));
-            round.setQuestionCount(request.questionsPerRound());
             roundRepo.save(round);
 
             for (int questionNumber = 1; questionNumber <= request.questionsPerRound(); questionNumber++) {
