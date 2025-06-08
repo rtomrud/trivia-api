@@ -77,9 +77,7 @@ public class GameController {
     }
 
     @PostMapping("/games")
-    public ResponseEntity<Game> createGame(
-            @RequestBody GameCreationRequest request,
-            HttpSession session) {
+    public ResponseEntity<Game> createGame(@RequestBody GameCreationRequest request, HttpSession session) {
         roomRepo.findById(request.roomId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid room id"));
 
@@ -99,8 +97,7 @@ public class GameController {
         game.setRoomId(request.roomId());
         game.setRoundCount(request.rounds());
         game.setCreatedAt(Instant.now());
-        game.setEndedAt(game.getCreatedAt().plus(
-                Duration.ofSeconds(request.rounds() * request.timePerRound())));
+        game.setEndedAt(game.getCreatedAt().plus(Duration.ofSeconds(request.rounds() * request.timePerRound())));
         gameRepo.save(game);
 
         // Create rounds and questions for the game, based on the game's settings
@@ -110,10 +107,8 @@ public class GameController {
             Round round = new Round();
             round.setGameId(game.getGameId());
             round.setRoundNumber(roundNumber);
-            round.setCreatedAt(Instant.now().plus(
-                    Duration.ofSeconds(request.timePerRound() * (roundNumber - 1))));
-            round.setEndedAt(round.getCreatedAt().plus(
-                    Duration.ofSeconds(request.timePerRound())));
+            round.setCreatedAt(Instant.now().plus(Duration.ofSeconds(request.timePerRound() * (roundNumber - 1))));
+            round.setEndedAt(round.getCreatedAt().plus(Duration.ofSeconds(request.timePerRound())));
             round.setQuestionCount(request.questionsPerRound());
             roundRepo.save(round);
 
@@ -121,9 +116,8 @@ public class GameController {
                 // Find a random question, based on the game's settings
                 Question question = null;
                 while (question == null || questionIds.contains(question.getQuestionId())) {
-                    question = questionRepo.findByDifficulty(request.difficulty(),
-                            PageRequest.of((int) (Math.random() * count), 1))
-                            .getContent().get(0);
+                    Pageable pageable = PageRequest.of((int) (Math.random() * count), 1);
+                    question = questionRepo.findByDifficulty(request.difficulty(), pageable).getContent().get(0);
                 }
 
                 // Store questionId to avoid repeating questions
@@ -179,9 +173,7 @@ public class GameController {
     }
 
     @GetMapping("/games/{gameId}/rounds/{roundId}/questions")
-    public ResponseEntity<List<Question>> getRoundQuestions(
-            @PathVariable Long gameId,
-            @PathVariable Long roundId) {
+    public ResponseEntity<List<Question>> getRoundQuestions(@PathVariable Long gameId, @PathVariable Long roundId) {
         gameRepo.findById(gameId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found"));
 
@@ -193,10 +185,8 @@ public class GameController {
         }
 
         List<Question> questions = questionRepo.findByRoundId(roundId);
-
-        // MUST NOT show the correct answers here!
         for (Question question : questions) {
-            question.setCorrectAnswers(null);
+            question.setCorrectAnswers(null); // Don't show correct answers until round is over
         }
 
         return ResponseEntity.ok(questions);

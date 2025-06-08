@@ -5,6 +5,5 @@ public record GameCreationRequest(
         Integer rounds,
         Integer timePerRound,
         Integer questionsPerRound,
-        Integer difficulty
-) {
+        Integer difficulty) {
 }
