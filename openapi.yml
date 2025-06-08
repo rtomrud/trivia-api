@@ -636,8 +636,6 @@ components:
       properties:
         answerId:
           type: integer
-        gameId:
-          type: integer
         roundId:
           type: integer
         questionId:

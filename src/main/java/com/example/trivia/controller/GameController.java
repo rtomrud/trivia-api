@@ -223,7 +223,6 @@ public class GameController {
         }
 
         Answer answer = new Answer();
-        answer.setGameId(gameId);
         answer.setRoundId(roundId);
         answer.setQuestionId(questionId);
         answer.setPlayerId(currentPlayer.getPlayerId());

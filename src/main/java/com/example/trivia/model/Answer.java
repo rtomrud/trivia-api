@@ -9,7 +9,6 @@ import java.time.Instant;
 public class Answer {
     @Id
     private Long answerId;
-    private Long gameId;
     private Long roundId;
     private Long questionId;
     private Long playerId;
@@ -26,14 +25,6 @@ public class Answer {
 
     public void setAnswerId(Long answerId) {
         this.answerId = answerId;
-    }
-
-    public Long getGameId() {
-        return gameId;
-    }
-
-    public void setGameId(Long gameId) {
-        this.gameId = gameId;
     }
 
     public Long getRoundId() {
