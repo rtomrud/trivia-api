@@ -117,7 +117,7 @@ public class GameController {
                 Question question = null;
                 while (question == null || questionIds.contains(question.getQuestionId())) {
                     Pageable pageable = PageRequest.of((int) (Math.random() * count), 1);
-                    question = questionRepo.findByDifficulty(request.difficulty(), pageable).getContent().get(0);
+                    question = questionRepo.findAll(pageable).getContent().get(0);
                 }
 
                 // Store questionId to avoid repeating questions

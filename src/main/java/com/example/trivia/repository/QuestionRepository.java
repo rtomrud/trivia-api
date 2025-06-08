@@ -12,10 +12,8 @@ import java.util.List;
 
 @Repository
 public interface QuestionRepository extends CrudRepository<Question, Long> {
+    Page<Question> findAll(Pageable pageable);
+
     @Query("SELECT questions.* FROM questions JOIN round_questions ON questions.question_id = round_questions.question_id WHERE round_questions.round_id = :roundId")
     List<Question> findByRoundId(Long roundId);
-
-    Page<Question> findByDifficulty(Integer difficulty, Pageable pageable);
-
-    Page<Question> findByDifficultyAndType(Integer difficulty, String type, Pageable pageable);
 }

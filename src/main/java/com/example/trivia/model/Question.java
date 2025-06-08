@@ -10,7 +10,6 @@ public class Question {
     @Id
     private Long questionId;
     private String type;
-    private Integer difficulty;
     private String text;
     private String mediaUrl; // nullable
     private List<String> options; // nullable
@@ -33,14 +32,6 @@ public class Question {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    public Integer getDifficulty() {
-        return difficulty;
-    }
-
-    public void setDifficulty(Integer difficulty) {
-        this.difficulty = difficulty;
     }
 
     public String getText() {
