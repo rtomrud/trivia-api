@@ -99,7 +99,11 @@ public class GameController {
 
         // Create rounds and questions for the game, based on the game's settings
         Set<Long> questionIds = new HashSet<>();
-        long count = questionRepo.count();
+        long questionCount = questionRepo.count();
+        if (questionCount < request.rounds() * request.questionsPerRound()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not enough questions");
+        }
+
         for (int roundNumber = 1; roundNumber <= request.rounds(); roundNumber++) {
             Round round = new Round();
             round.setGameId(game.getGameId());
@@ -112,7 +116,7 @@ public class GameController {
                 // Find a random question, based on the game's settings
                 Question question = null;
                 while (question == null || questionIds.contains(question.getQuestionId())) {
-                    Pageable pageable = PageRequest.of((int) (Math.random() * count), 1);
+                    Pageable pageable = PageRequest.of((int) (Math.random() * questionCount), 1);
                     question = questionRepo.findAll(pageable).getContent().get(0);
                 }
 
