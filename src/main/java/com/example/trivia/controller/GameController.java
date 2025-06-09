@@ -16,6 +16,7 @@ import com.example.trivia.repository.QuestionRepository;
 import com.example.trivia.repository.RoomRepository;
 import com.example.trivia.repository.RoundQuestionRepository;
 import com.example.trivia.repository.RoundRepository;
+import com.example.trivia.util.LinkHeaderBuilder;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -72,10 +73,19 @@ public class GameController {
                 ? gameRepo.findByRoomId(roomId, pageable)
                 : gameRepo.findAll(pageable);
 
-        String baseUrl = "/games" + (roomId != null ? "?roomId=" + roomId : "?");
-        return ResponseEntity.ok()
-                .header("Link", buildLinkHeader(games, page, size, baseUrl))
-                .body(games.toList());
+        String url = UriComponentsBuilder.fromPath("/games")
+                .replaceQueryParam("roomId", roomId)
+                .replaceQueryParam("page", page)
+                .replaceQueryParam("size", size)
+                .toUriString();
+
+        String linkHeader = LinkHeaderBuilder.buildWithPaginationLinks(
+                games.getNumber(),
+                games.getSize(),
+                games.getTotalPages(),
+                url);
+
+        return ResponseEntity.ok().header("Link", linkHeader).body(games.toList());
     }
 
     @PostMapping("/games")
@@ -257,36 +267,5 @@ public class GameController {
 
         List<Answer> answers = answerRepo.findByRoundIdAndQuestionId(roundId, questionId);
         return ResponseEntity.ok(answers);
-    }
-
-    private String buildLinkHeader(Page<?> entityPage, int page, int size, String baseUrl) {
-        StringBuilder linkHeader = new StringBuilder();
-        UriComponentsBuilder builder = UriComponentsBuilder.fromPath(baseUrl);
-        
-        builder.queryParam("size", size);
-        
-        addLink(linkHeader, builder.cloneBuilder(), page, "self");
-        if (entityPage.hasNext()) {
-            addLink(linkHeader, builder.cloneBuilder(), page + 1, "next");
-        }
-
-        if (entityPage.hasPrevious()) {
-            addLink(linkHeader, builder.cloneBuilder(), page - 1, "prev");
-        }
-
-        addLink(linkHeader, builder.cloneBuilder(), 0, "first");
-        addLink(linkHeader, builder.cloneBuilder(), entityPage.getTotalPages() - 1, "last");
-        
-        return linkHeader.toString();
-    }
-
-    private void addLink(StringBuilder linkHeader, UriComponentsBuilder builder, int page, String rel) {
-        builder.queryParam("page", page);
-
-        if (linkHeader.length() > 0) {
-            linkHeader.append(", ");
-        }
-
-        linkHeader.append(String.format("<%s>; rel=\"%s\"", builder.build().toUriString(), rel));
     }
 }
