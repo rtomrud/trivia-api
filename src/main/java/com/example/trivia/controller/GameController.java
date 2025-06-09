@@ -26,7 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.time.Duration;
@@ -72,8 +72,9 @@ public class GameController {
                 ? gameRepo.findByRoomId(roomId, pageable)
                 : gameRepo.findAll(pageable);
 
+        String baseUrl = "/games" + (roomId != null ? "?roomId=" + roomId : "?");
         return ResponseEntity.ok()
-                .header("Link", buildLinkHeader(games, page, size))
+                .header("Link", buildLinkHeader(games, page, size, baseUrl))
                 .body(games.toList());
     }
 
@@ -258,39 +259,34 @@ public class GameController {
         return ResponseEntity.ok(answers);
     }
 
-    private String buildLinkHeader(Page<?> entityPage, int page, int size) {
-        ServletUriComponentsBuilder builder = ServletUriComponentsBuilder.fromCurrentRequest();
+    private String buildLinkHeader(Page<?> entityPage, int page, int size, String baseUrl) {
         StringBuilder linkHeader = new StringBuilder();
-
-        String selfLink = builder.replaceQueryParam("page", page)
-                .replaceQueryParam("size", size)
-                .toUriString();
-        linkHeader.append(String.format("<%s>; rel=\"self\"", selfLink));
-
+        UriComponentsBuilder builder = UriComponentsBuilder.fromPath(baseUrl);
+        
+        builder.queryParam("size", size);
+        
+        addLink(linkHeader, builder.cloneBuilder(), page, "self");
         if (entityPage.hasNext()) {
-            String nextLink = builder.replaceQueryParam("page", page + 1)
-                    .replaceQueryParam("size", size)
-                    .toUriString();
-            linkHeader.append(", ").append(String.format("<%s>; rel=\"next\"", nextLink));
+            addLink(linkHeader, builder.cloneBuilder(), page + 1, "next");
         }
 
         if (entityPage.hasPrevious()) {
-            String prevLink = builder.replaceQueryParam("page", page - 1)
-                    .replaceQueryParam("size", size)
-                    .toUriString();
-            linkHeader.append(", ").append(String.format("<%s>; rel=\"prev\"", prevLink));
+            addLink(linkHeader, builder.cloneBuilder(), page - 1, "prev");
         }
 
-        String firstLink = builder.replaceQueryParam("page", 0)
-                .replaceQueryParam("size", size)
-                .toUriString();
-        linkHeader.append(", ").append(String.format("<%s>; rel=\"first\"", firstLink));
-
-        String lastLink = builder.replaceQueryParam("page", entityPage.getTotalPages() - 1)
-                .replaceQueryParam("size", size)
-                .toUriString();
-        linkHeader.append(", ").append(String.format("<%s>; rel=\"last\"", lastLink));
-
+        addLink(linkHeader, builder.cloneBuilder(), 0, "first");
+        addLink(linkHeader, builder.cloneBuilder(), entityPage.getTotalPages() - 1, "last");
+        
         return linkHeader.toString();
+    }
+
+    private void addLink(StringBuilder linkHeader, UriComponentsBuilder builder, int page, String rel) {
+        builder.queryParam("page", page);
+
+        if (linkHeader.length() > 0) {
+            linkHeader.append(", ");
+        }
+
+        linkHeader.append(String.format("<%s>; rel=\"%s\"", builder.build().toUriString(), rel));
     }
 }
