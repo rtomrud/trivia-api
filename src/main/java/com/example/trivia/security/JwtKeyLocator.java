@@ -10,7 +10,9 @@ import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.security.Keys;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+@Component
 public class JwtKeyLocator extends LocatorAdapter<Key> {
     private final SecretKey key;
 
