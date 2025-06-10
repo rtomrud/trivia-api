@@ -39,7 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
                         .parseSignedClaims(jwt)
                         .getPayload();
 
-                request.setAttribute("claims", claims);
+                request.setAttribute("playerId", Long.parseLong(claims.getSubject()));
             } catch (JwtException e) {
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 response.getWriter().write("Unauthorized: " + e.getMessage());

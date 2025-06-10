@@ -13,7 +13,7 @@ import com.example.trivia.security.JwtKeyLocator;
 
 import io.jsonwebtoken.Jwts;
 
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,11 +63,11 @@ public class RoomController {
     }
 
     @DeleteMapping("/rooms/{roomId}")
-    public ResponseEntity<Void> deleteRoom(@PathVariable Long roomId, HttpSession session) {
+    public ResponseEntity<Void> deleteRoom(@PathVariable Long roomId, HttpServletRequest request) {
         Room room = roomRepo.findById(roomId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
-        Long currentPlayerId = (Long) session.getAttribute(roomId.toString());
+        Long currentPlayerId = (Long) request.getAttribute("playerId");
         if (currentPlayerId == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
         }
@@ -83,8 +83,7 @@ public class RoomController {
     @PostMapping("/rooms/{roomId}/players")
     public ResponseEntity<JoinRoomResponse> joinRoom(
             @PathVariable Long roomId,
-            @RequestBody JoinRoomRequest request,
-            HttpSession session) {
+            @RequestBody JoinRoomRequest request) {
         Room room = roomRepo.findById(roomId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
@@ -102,8 +101,6 @@ public class RoomController {
             room.setHostId(player.getPlayerId());
             roomRepo.save(room);
         }
-
-        session.setAttribute(room.getRoomId().toString(), player.getPlayerId());
 
         String jwt = Jwts.builder()
                 .subject(player.getPlayerId().toString())
@@ -129,21 +126,17 @@ public class RoomController {
     public ResponseEntity<Void> deletePlayer(
             @PathVariable Long roomId,
             @PathVariable Long playerId,
-            HttpSession session) {
+            HttpServletRequest request) {
         Room room = roomRepo.findById(roomId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
-        Long currentPlayerId = (Long) session.getAttribute(roomId.toString());
+        Long currentPlayerId = (Long) request.getAttribute("playerId");
         if (currentPlayerId == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
         }
 
         if (!room.getHostId().equals(currentPlayerId) && !playerId.equals(currentPlayerId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can delete another player");
-        }
-
-        if (playerId.equals(currentPlayerId)) {
-            session.removeAttribute(roomId.toString());
         }
 
         playerRepo.deleteById(playerId);
@@ -163,11 +156,11 @@ public class RoomController {
     }
 
     @PostMapping("/rooms/{roomId}/teams")
-    public ResponseEntity<Team> createTeam(@PathVariable Long roomId, HttpSession session) {
+    public ResponseEntity<Team> createTeam(@PathVariable Long roomId, HttpServletRequest request) {
         Room room = roomRepo.findById(roomId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
-        Long currentPlayerId = (Long) session.getAttribute(roomId.toString());
+        Long currentPlayerId = (Long) request.getAttribute("playerId");
         if (currentPlayerId == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
         }
@@ -194,11 +187,11 @@ public class RoomController {
     }
 
     @DeleteMapping("/rooms/{roomId}/teams/{teamId}")
-    public ResponseEntity<Void> deleteTeam(@PathVariable Long roomId, @PathVariable Long teamId, HttpSession session) {
+    public ResponseEntity<Void> deleteTeam(@PathVariable Long roomId, @PathVariable Long teamId, HttpServletRequest request) {
         Room room = roomRepo.findById(roomId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
-        Long currentPlayerId = (Long) session.getAttribute(roomId.toString());
+        Long currentPlayerId = (Long) request.getAttribute("playerId");
         if (currentPlayerId == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
         }
@@ -228,7 +221,7 @@ public class RoomController {
             @PathVariable Long roomId,
             @PathVariable Long teamId,
             @PathVariable Long playerId,
-            HttpSession session) {
+            HttpServletRequest request) {
         Room room = roomRepo.findById(roomId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
@@ -238,7 +231,7 @@ public class RoomController {
         Player player = playerRepo.findById(playerId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found"));
 
-        Long currentPlayerId = (Long) session.getAttribute(roomId.toString());
+        Long currentPlayerId = (Long) request.getAttribute("playerId");
         if (currentPlayerId == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
         }
@@ -257,7 +250,7 @@ public class RoomController {
             @PathVariable Long roomId,
             @PathVariable Long teamId,
             @PathVariable Long playerId,
-            HttpSession session) {
+            HttpServletRequest request) {
         Room room = roomRepo.findById(roomId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
@@ -267,7 +260,7 @@ public class RoomController {
         Player player = playerRepo.findById(playerId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found"));
 
-        Long currentPlayerId = (Long) session.getAttribute(roomId.toString());
+        Long currentPlayerId = (Long) request.getAttribute("playerId");
         if (currentPlayerId == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
         }

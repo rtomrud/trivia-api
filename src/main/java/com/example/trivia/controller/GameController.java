@@ -18,7 +18,7 @@ import com.example.trivia.repository.RoundQuestionRepository;
 import com.example.trivia.repository.RoundRepository;
 import com.example.trivia.util.LinkHeaderBuilder;
 
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -89,11 +89,11 @@ public class GameController {
     }
 
     @PostMapping("/games")
-    public ResponseEntity<Game> createGame(@RequestBody GameCreationRequest request, HttpSession session) {
-        Room room = roomRepo.findById(request.roomId())
+    public ResponseEntity<Game> createGame(@RequestBody GameCreationRequest body, HttpServletRequest request) {
+        Room room = roomRepo.findById(body.roomId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid room id"));
 
-        Long currentPlayerId = (Long) session.getAttribute(request.roomId().toString());
+        Long currentPlayerId = (Long) request.getAttribute("playerId");
         if (currentPlayerId == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
         }
@@ -103,27 +103,27 @@ public class GameController {
         }
 
         Game game = new Game();
-        game.setRoomId(request.roomId());
+        game.setRoomId(body.roomId());
         game.setCreatedAt(Instant.now());
-        game.setEndedAt(game.getCreatedAt().plus(Duration.ofSeconds(request.rounds() * request.timePerRound())));
+        game.setEndedAt(game.getCreatedAt().plus(Duration.ofSeconds(body.rounds() * body.timePerRound())));
         game = gameRepo.save(game);
 
         // Create rounds and questions for the game, based on the game's settings
         Set<Long> questionIds = new HashSet<>();
         long questionCount = questionRepo.count();
-        if (questionCount < request.rounds() * request.questionsPerRound()) {
+        if (questionCount < body.rounds() * body.questionsPerRound()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not enough questions");
         }
 
-        for (int roundNumber = 1; roundNumber <= request.rounds(); roundNumber++) {
+        for (int roundNumber = 1; roundNumber <= body.rounds(); roundNumber++) {
             Round round = new Round();
             round.setGameId(game.getGameId());
             round.setRoundNumber(roundNumber);
-            round.setCreatedAt(Instant.now().plus(Duration.ofSeconds(request.timePerRound() * (roundNumber - 1))));
-            round.setEndedAt(round.getCreatedAt().plus(Duration.ofSeconds(request.timePerRound())));
+            round.setCreatedAt(Instant.now().plus(Duration.ofSeconds(body.timePerRound() * (roundNumber - 1))));
+            round.setEndedAt(round.getCreatedAt().plus(Duration.ofSeconds(body.timePerRound())));
             round = roundRepo.save(round);
 
-            for (int questionNumber = 1; questionNumber <= request.questionsPerRound(); questionNumber++) {
+            for (int questionNumber = 1; questionNumber <= body.questionsPerRound(); questionNumber++) {
                 // Find a random question, based on the game's settings
                 Question question = null;
                 while (question == null || questionIds.contains(question.getQuestionId())) {
@@ -154,14 +154,14 @@ public class GameController {
     }
 
     @DeleteMapping("/games/{gameId}")
-    public ResponseEntity<Void> deleteGame(@PathVariable Long gameId, HttpSession session) {
+    public ResponseEntity<Void> deleteGame(@PathVariable Long gameId, HttpServletRequest request) {
         Game game = gameRepo.findById(gameId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found"));
 
         Room room = roomRepo.findById(game.getRoomId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
-        Long currentPlayerId = (Long) session.getAttribute(room.getRoomId().toString());
+        Long currentPlayerId = (Long) request.getAttribute("playerId");
         if (currentPlayerId == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
         }
@@ -208,8 +208,8 @@ public class GameController {
             @PathVariable Long gameId,
             @PathVariable Long roundId,
             @PathVariable Long questionId,
-            @RequestBody AnswerSubmissionRequest request,
-            HttpSession session) {
+            @RequestBody AnswerSubmissionRequest body,
+            HttpServletRequest request) {
         Game game = gameRepo.findById(gameId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found"));
 
@@ -219,7 +219,7 @@ public class GameController {
         Question question = questionRepo.findById(questionId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found"));
 
-        Long currentPlayerId = (Long) session.getAttribute(game.getRoomId().toString());
+        Long currentPlayerId = (Long) request.getAttribute("playerId");
         if (currentPlayerId == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
         }
@@ -239,7 +239,7 @@ public class GameController {
         answer.setRoundId(roundId);
         answer.setQuestionId(questionId);
         answer.setPlayerId(currentPlayer.getPlayerId());
-        answer.setAnswer(request.answer());
+        answer.setAnswer(body.answer());
         answer.setCreatedAt(Instant.now());
         answer.setCorrect(question.getCorrectAnswers().stream()
                 .anyMatch(correctAnswer -> answer.getAnswer().equalsIgnoreCase(correctAnswer)));

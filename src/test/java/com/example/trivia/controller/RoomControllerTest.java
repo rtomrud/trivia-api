@@ -20,8 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import jakarta.servlet.http.HttpSession;
-
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
@@ -107,32 +106,28 @@ class RoomControllerTest {
     
     @Test
     void joinRoom_createsNewPlayerAndReturns201() {
-        JoinRoomRequest request = new JoinRoomRequest("TEST123", "testUser");
-        HttpSession session = mock(HttpSession.class);
-        
-        when(jwtKeyLocator.locate(any())).thenReturn(Keys.hmacShaKeyFor("test-secret-key-1234567890123456".getBytes(StandardCharsets.UTF_8)));
+        JoinRoomRequest joinRequest = new JoinRoomRequest("TEST123", "testUser");
+        when(jwtKeyLocator.locate(any())).thenReturn(
+            Keys.hmacShaKeyFor("test-secret-key-1234567890123456".getBytes(StandardCharsets.UTF_8)));
         when(roomRepo.findById(1L)).thenReturn(Optional.of(testRoom));
         when(playerRepo.save(any(Player.class))).thenReturn(testPlayer);
         
-        ResponseEntity<JoinRoomResponse> response = controller.joinRoom(1L, request, session);
+        ResponseEntity<JoinRoomResponse> response = controller.joinRoom(1L, joinRequest);
         
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(testPlayer.getPlayerId(), response.getBody().player().getPlayerId());
         verify(roomRepo, times(1)).findById(1L);
         verify(playerRepo, times(1)).save(any(Player.class));
-        verify(session, times(1)).setAttribute("1", testPlayer.getPlayerId());
     }
     
     @Test
     void joinRoom_throws404WhenRoomNotFound() {
-        JoinRoomRequest request = new JoinRoomRequest("TEST123", "testUser");
-        HttpSession session = mock(HttpSession.class);
-        
+        JoinRoomRequest joinRequest = new JoinRoomRequest("TEST123", "testUser");
         when(roomRepo.findById(1L)).thenReturn(Optional.empty());
         
         assertThrows(ResponseStatusException.class, () -> {
-            controller.joinRoom(1L, request, session);
+            controller.joinRoom(1L, joinRequest);
         });
         
         verify(roomRepo, times(1)).findById(1L);
@@ -140,13 +135,11 @@ class RoomControllerTest {
     
     @Test
     void joinRoom_throws400WhenInvalidCode() {
-        JoinRoomRequest request = new JoinRoomRequest("INVALID", "testUser");
-        HttpSession session = mock(HttpSession.class);
-        
+        JoinRoomRequest joinRequest = new JoinRoomRequest("INVALID", "testUser");
         when(roomRepo.findById(1L)).thenReturn(Optional.of(testRoom));
         
         assertThrows(ResponseStatusException.class, () -> {
-            controller.joinRoom(1L, request, session);
+            controller.joinRoom(1L, joinRequest);
         });
         
         verify(roomRepo, times(1)).findById(1L);
@@ -154,13 +147,13 @@ class RoomControllerTest {
     
     @Test
     void deleteRoom_throws401WhenNotAuthenticated() {
-        HttpSession session = mock(HttpSession.class);
-        when(session.getAttribute("1")).thenReturn(null);
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getAttribute("playerId")).thenReturn(null);
         
         when(roomRepo.findById(1L)).thenReturn(Optional.of(testRoom));
         
         assertThrows(ResponseStatusException.class, () -> {
-            controller.deleteRoom(1L, session);
+            controller.deleteRoom(1L, request);
         });
         
         verify(roomRepo, times(1)).findById(1L);
@@ -168,14 +161,14 @@ class RoomControllerTest {
     
     @Test
     void deleteRoom_throws403WhenNotHost() {
-        HttpSession session = mock(HttpSession.class);
-        when(session.getAttribute("1")).thenReturn(2L);
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getAttribute("playerId")).thenReturn(2L);
         
         testRoom.setHostId(1L);
         when(roomRepo.findById(1L)).thenReturn(Optional.of(testRoom));
         
         assertThrows(ResponseStatusException.class, () -> {
-            controller.deleteRoom(1L, session);
+            controller.deleteRoom(1L, request);
         });
         
         verify(roomRepo, times(1)).findById(1L);
@@ -183,13 +176,13 @@ class RoomControllerTest {
     
     @Test
     void deleteRoom_deletesRoomWhenHost() {
-        HttpSession session = mock(HttpSession.class);
-        when(session.getAttribute("1")).thenReturn(1L);
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getAttribute("playerId")).thenReturn(1L);
         
         testRoom.setHostId(1L);
         when(roomRepo.findById(1L)).thenReturn(Optional.of(testRoom));
         
-        ResponseEntity<Void> response = controller.deleteRoom(1L, session);
+        ResponseEntity<Void> response = controller.deleteRoom(1L, request);
         
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(roomRepo, times(1)).findById(1L);

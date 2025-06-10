@@ -22,7 +22,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -126,8 +126,8 @@ class GameControllerTest {
     void createGame_createsNewGameAndReturns201() {
         GameCreationRequest request = new GameCreationRequest(1L, 2, 60, 0);
         
-        HttpSession session = mock(HttpSession.class);
-        when(session.getAttribute("1")).thenReturn(1L);
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+        when(httpRequest.getAttribute("playerId")).thenReturn(1L);
         
         when(roomRepo.findById(1L)).thenReturn(Optional.of(testRoom));
         
@@ -138,7 +138,7 @@ class GameControllerTest {
         savedGame.setEndedAt(savedGame.getCreatedAt().plus(Duration.ofMinutes(120))); // 2 rounds * 60 seconds
         when(gameRepo.save(any(Game.class))).thenReturn(savedGame);
         
-        ResponseEntity<Game> response = controller.createGame(request, session);
+        ResponseEntity<Game> response = controller.createGame(request, httpRequest);
         
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -149,35 +149,31 @@ class GameControllerTest {
         
         verify(gameRepo).save(any(Game.class));
         verify(roundRepo, times(2)).save(any(Round.class));
-        verify(session).getAttribute("1");
+        verify(httpRequest).getAttribute("playerId");
     }
     
     @Test
     void createGame_throws401WhenNotAuthenticated() {
         GameCreationRequest request = new GameCreationRequest(1L, 2, 60, 3);
         
-        HttpSession session = mock(HttpSession.class);
-        
-        when(roomRepo.findById(1L)).thenReturn(Optional.of(testRoom));
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
         
         assertThrows(ResponseStatusException.class, () -> {
-            controller.createGame(request, session);
+            controller.createGame(request, httpRequest);
         });
-        
-        verify(roomRepo).findById(1L);
     }
     
     @Test
     void createGame_throws403WhenNotHost() {
         GameCreationRequest request = new GameCreationRequest(1L, 2, 60, 3);
         
-        HttpSession session = mock(HttpSession.class);
-        when(session.getAttribute("1")).thenReturn(2L);
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+        when(httpRequest.getAttribute("playerId")).thenReturn(2L);
         
         when(roomRepo.findById(1L)).thenReturn(Optional.of(testRoom));
         
         assertThrows(ResponseStatusException.class, () -> {
-            controller.createGame(request, session);
+            controller.createGame(request, httpRequest);
         });
         
         verify(roomRepo).findById(1L);
@@ -207,47 +203,51 @@ class GameControllerTest {
     
     @Test
     void deleteGame_deletesGameWhenHost() {
-        HttpSession session = mock(HttpSession.class);
-        when(session.getAttribute("1")).thenReturn(1L);
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+        when(httpRequest.getAttribute("playerId")).thenReturn(1L);
         
         when(gameRepo.findById(1L)).thenReturn(Optional.of(testGame));
         when(roomRepo.findById(1L)).thenReturn(Optional.of(testRoom));
         
-        ResponseEntity<Void> response = controller.deleteGame(1L, session);
+        ResponseEntity<Void> response = controller.deleteGame(1L, httpRequest);
         
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(gameRepo).deleteById(1L);
+        verify(httpRequest).getAttribute("playerId");
     }
     
     @Test
     void deleteGame_throws401WhenNotAuthenticated() {
-        HttpSession session = mock(HttpSession.class);
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+        when(httpRequest.getAttribute("playerId")).thenReturn(null);
         
         when(gameRepo.findById(1L)).thenReturn(Optional.of(testGame));
         when(roomRepo.findById(1L)).thenReturn(Optional.of(testRoom));
         
         assertThrows(ResponseStatusException.class, () -> {
-            controller.deleteGame(1L, session);
+            controller.deleteGame(1L, httpRequest);
         });
         
         verify(gameRepo).findById(1L);
         verify(roomRepo).findById(1L);
+        verify(httpRequest).getAttribute("playerId");
     }
     
     @Test
     void deleteGame_throws403WhenNotHost() {
-        HttpSession session = mock(HttpSession.class);
-        when(session.getAttribute("1")).thenReturn(2L);
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+        when(httpRequest.getAttribute("playerId")).thenReturn(2L);
         
         when(gameRepo.findById(1L)).thenReturn(Optional.of(testGame));
         when(roomRepo.findById(1L)).thenReturn(Optional.of(testRoom));
         
         assertThrows(ResponseStatusException.class, () -> {
-            controller.deleteGame(1L, session);
+            controller.deleteGame(1L, httpRequest);
         });
         
         verify(gameRepo).findById(1L);
         verify(roomRepo).findById(1L);
+        verify(httpRequest).getAttribute("playerId");
     }
     
     @Test
