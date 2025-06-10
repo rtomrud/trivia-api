@@ -1,15 +1,15 @@
 package com.example.trivia.security;
 
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
+
+import javax.crypto.SecretKey;
+
 import io.jsonwebtoken.LocatorAdapter;
 import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.security.Keys;
 
 import org.springframework.beans.factory.annotation.Value;
-
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
-
-import javax.crypto.SecretKey;
 
 public class JwtKeyLocator extends LocatorAdapter<Key> {
     private final SecretKey key;

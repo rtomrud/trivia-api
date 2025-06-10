@@ -1,22 +1,11 @@
 package com.example.trivia.controller;
 
-import com.example.trivia.dto.AnswerSubmissionRequest;
-import com.example.trivia.dto.GameCreationRequest;
-import com.example.trivia.model.Answer;
-import com.example.trivia.model.Game;
-import com.example.trivia.model.Player;
-import com.example.trivia.model.Question;
-import com.example.trivia.model.Room;
-import com.example.trivia.model.Round;
-import com.example.trivia.model.RoundQuestion;
-import com.example.trivia.repository.AnswerRepository;
-import com.example.trivia.repository.GameRepository;
-import com.example.trivia.repository.PlayerRepository;
-import com.example.trivia.repository.QuestionRepository;
-import com.example.trivia.repository.RoomRepository;
-import com.example.trivia.repository.RoundQuestionRepository;
-import com.example.trivia.repository.RoundRepository;
-import com.example.trivia.util.LinkHeaderBuilder;
+import java.net.URI;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -35,12 +24,23 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URI;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import com.example.trivia.dto.AnswerSubmissionRequest;
+import com.example.trivia.dto.GameCreationRequest;
+import com.example.trivia.model.Answer;
+import com.example.trivia.model.Game;
+import com.example.trivia.model.Player;
+import com.example.trivia.model.Question;
+import com.example.trivia.model.Room;
+import com.example.trivia.model.Round;
+import com.example.trivia.model.RoundQuestion;
+import com.example.trivia.repository.AnswerRepository;
+import com.example.trivia.repository.GameRepository;
+import com.example.trivia.repository.PlayerRepository;
+import com.example.trivia.repository.QuestionRepository;
+import com.example.trivia.repository.RoomRepository;
+import com.example.trivia.repository.RoundQuestionRepository;
+import com.example.trivia.repository.RoundRepository;
+import com.example.trivia.util.LinkHeaderBuilder;
 
 @RestController
 public class GameController {

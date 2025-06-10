@@ -1,9 +1,9 @@
 package com.example.trivia.model;
 
+import java.util.List;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
-
-import java.util.List;
 
 @Table("questions")
 public class Question {

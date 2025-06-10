@@ -1,9 +1,9 @@
 package com.example.trivia.model;
 
+import java.time.Instant;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
-
-import java.time.Instant;
 
 @Table("games")
 public class Game {

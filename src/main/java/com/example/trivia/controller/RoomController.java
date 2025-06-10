@@ -1,15 +1,9 @@
 package com.example.trivia.controller;
 
-import com.example.trivia.dto.JoinRoomRequest;
-import com.example.trivia.dto.JoinRoomResponse;
-import com.example.trivia.dto.RoomCreationRequest;
-import com.example.trivia.model.Player;
-import com.example.trivia.model.Room;
-import com.example.trivia.model.Team;
-import com.example.trivia.repository.PlayerRepository;
-import com.example.trivia.repository.RoomRepository;
-import com.example.trivia.repository.TeamRepository;
-import com.example.trivia.security.JwtKeyLocator;
+import java.net.URI;
+import java.time.Instant;
+import java.util.Date;
+import java.util.List;
 
 import io.jsonwebtoken.Jwts;
 
@@ -25,10 +19,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.net.URI;
-import java.time.Instant;
-import java.util.Date;
-import java.util.List;
+import com.example.trivia.dto.JoinRoomRequest;
+import com.example.trivia.dto.JoinRoomResponse;
+import com.example.trivia.dto.RoomCreationRequest;
+import com.example.trivia.model.Player;
+import com.example.trivia.model.Room;
+import com.example.trivia.model.Team;
+import com.example.trivia.repository.PlayerRepository;
+import com.example.trivia.repository.RoomRepository;
+import com.example.trivia.repository.TeamRepository;
+import com.example.trivia.security.JwtKeyLocator;
 
 @RestController
 public class RoomController {

@@ -1,11 +1,11 @@
 package com.example.trivia.repository;
 
-import com.example.trivia.model.Round;
+import java.util.List;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.example.trivia.model.Round;
 
 @Repository
 public interface RoundRepository extends CrudRepository<Round, Long> {
