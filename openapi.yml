@@ -103,7 +103,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Player"
+                type: object
+                properties:
+                  player:
+                    $ref: "#/components/schemas/Player"
+                  token:
+                    type: string
         "400":
           description: Invalid room code
         "404":

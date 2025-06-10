@@ -1,6 +1,7 @@
 package com.example.trivia.controller;
 
 import com.example.trivia.dto.JoinRoomRequest;
+import com.example.trivia.dto.JoinRoomResponse;
 import com.example.trivia.dto.RoomCreationRequest;
 import com.example.trivia.model.Player;
 import com.example.trivia.model.Room;
@@ -8,6 +9,9 @@ import com.example.trivia.model.Team;
 import com.example.trivia.repository.PlayerRepository;
 import com.example.trivia.repository.RoomRepository;
 import com.example.trivia.repository.TeamRepository;
+import com.example.trivia.security.JwtKeyLocator;
+
+import io.jsonwebtoken.Jwts;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -18,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URI;
 import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -25,14 +30,17 @@ public class RoomController {
     private final PlayerRepository playerRepo;
     private final RoomRepository roomRepo;
     private final TeamRepository teamRepo;
+    private final JwtKeyLocator jwtKeyLocator;
 
     public RoomController(
             PlayerRepository playerRepo,
             RoomRepository roomRepo,
-            TeamRepository teamRepo) {
+            TeamRepository teamRepo,
+            JwtKeyLocator jwtKeyLocator) {
         this.playerRepo = playerRepo;
         this.roomRepo = roomRepo;
         this.teamRepo = teamRepo;
+        this.jwtKeyLocator = jwtKeyLocator;
     }
 
     @PostMapping("/rooms")
@@ -73,7 +81,7 @@ public class RoomController {
     }
 
     @PostMapping("/rooms/{roomId}/players")
-    public ResponseEntity<Player> joinRoom(
+    public ResponseEntity<JoinRoomResponse> joinRoom(
             @PathVariable Long roomId,
             @RequestBody JoinRoomRequest request,
             HttpSession session) {
@@ -97,8 +105,15 @@ public class RoomController {
 
         session.setAttribute(room.getRoomId().toString(), player.getPlayerId());
 
+        String jwt = Jwts.builder()
+                .subject(player.getPlayerId().toString())
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + 86400000))
+                .signWith(this.jwtKeyLocator.locate(null))
+                .compact();
+
         URI location = URI.create("/rooms/" + roomId + "/players/" + player.getPlayerId());
-        return ResponseEntity.created(location).body(player);
+        return ResponseEntity.created(location).body(new JoinRoomResponse(player, jwt));
     }
 
     @GetMapping("/rooms/{roomId}/players")

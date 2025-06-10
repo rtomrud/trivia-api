@@ -1,12 +1,16 @@
 package com.example.trivia.controller;
 
 import com.example.trivia.dto.JoinRoomRequest;
+import com.example.trivia.dto.JoinRoomResponse;
 import com.example.trivia.dto.RoomCreationRequest;
 import com.example.trivia.model.Player;
 import com.example.trivia.model.Room;
 import com.example.trivia.repository.PlayerRepository;
 import com.example.trivia.repository.RoomRepository;
 import com.example.trivia.repository.TeamRepository;
+import com.example.trivia.security.JwtKeyLocator;
+
+import io.jsonwebtoken.security.Keys;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,15 +26,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RoomControllerTest {
+    @Mock
+    private JwtKeyLocator jwtKeyLocator;
+    
     @Mock
     private PlayerRepository playerRepo;
     
@@ -101,14 +110,15 @@ class RoomControllerTest {
         JoinRoomRequest request = new JoinRoomRequest("TEST123", "testUser");
         HttpSession session = mock(HttpSession.class);
         
+        when(jwtKeyLocator.locate(any())).thenReturn(Keys.hmacShaKeyFor("test-secret-key-1234567890123456".getBytes(StandardCharsets.UTF_8)));
         when(roomRepo.findById(1L)).thenReturn(Optional.of(testRoom));
         when(playerRepo.save(any(Player.class))).thenReturn(testPlayer);
         
-        ResponseEntity<Player> response = controller.joinRoom(1L, request, session);
+        ResponseEntity<JoinRoomResponse> response = controller.joinRoom(1L, request, session);
         
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(testPlayer.getPlayerId(), response.getBody().getPlayerId());
+        assertEquals(testPlayer.getPlayerId(), response.getBody().player().getPlayerId());
         verify(roomRepo, times(1)).findById(1L);
         verify(playerRepo, times(1)).save(any(Player.class));
         verify(session, times(1)).setAttribute("1", testPlayer.getPlayerId());
