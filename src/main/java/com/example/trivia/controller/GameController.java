@@ -241,7 +241,8 @@ public class GameController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Player is not in the room");
         }
 
-        Answer answer = new Answer();
+        Answer answer = answerRepo.findByRoundIdAndQuestionIdAndPlayerId(roundId, questionId, currentPlayerId)
+                .orElse(new Answer());
         answer.setRoundId(roundId);
         answer.setQuestionId(questionId);
         answer.setPlayerId(currentPlayer.getPlayerId());
