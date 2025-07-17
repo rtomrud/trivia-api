@@ -50,10 +50,10 @@ public class RoomController {
     }
 
     @PostMapping("/rooms")
-    public ResponseEntity<Room> createRoom(@RequestBody RoomCreationRequest request) {
+    public ResponseEntity<Room> createRoom(@RequestBody RoomCreationRequest body) {
         Room room = new Room();
         room.setCreatedAt(Instant.now());
-        room.setCode(request.code());
+        room.setCode(body.code());
         room = roomRepo.save(room);
 
         URI roomUrl = URI.create("/rooms/" + room.getRoomId());
@@ -87,19 +87,17 @@ public class RoomController {
     }
 
     @PostMapping("/rooms/{roomId}/players")
-    public ResponseEntity<JoinRoomResponse> joinRoom(
-            @PathVariable Long roomId,
-            @RequestBody JoinRoomRequest request) {
+    public ResponseEntity<JoinRoomResponse> joinRoom(@PathVariable Long roomId, @RequestBody JoinRoomRequest body) {
         Room room = roomRepo.findById(roomId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
-        if (!room.getCode().equals(request.code())) {
+        if (!room.getCode().equals(body.code())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid room code");
         }
 
         Player player = new Player();
         player.setRoomId(roomId);
-        player.setUsername(request.username());
+        player.setUsername(body.username());
         player = playerRepo.save(player);
 
         // First player to join becomes the host
@@ -193,7 +191,8 @@ public class RoomController {
     }
 
     @DeleteMapping("/rooms/{roomId}/teams/{teamId}")
-    public ResponseEntity<Void> deleteTeam(@PathVariable Long roomId, @PathVariable Long teamId, HttpServletRequest request) {
+    public ResponseEntity<Void> deleteTeam(@PathVariable Long roomId, @PathVariable Long teamId,
+            HttpServletRequest request) {
         Room room = roomRepo.findById(roomId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
@@ -243,7 +242,8 @@ public class RoomController {
         }
 
         if (!room.getHostId().equals(currentPlayerId) && !playerId.equals(currentPlayerId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can assign another player to a team");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Only the host can assign another player to a team");
         }
 
         player.setTeamId(teamId);
@@ -272,7 +272,8 @@ public class RoomController {
         }
 
         if (!room.getHostId().equals(currentPlayerId) && !playerId.equals(currentPlayerId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can remove another player from a team");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Only the host can remove another player from a team");
         }
 
         player.setTeamId(null);
