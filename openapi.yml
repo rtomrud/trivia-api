@@ -276,7 +276,7 @@ paths:
           schema:
             type: integer
       responses:
-        "200":
+        "204":
           description: Player assigned to team
         "401":
           description: Player not authenticated
