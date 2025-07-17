@@ -1,8 +1,8 @@
 package com.example.trivia.controller;
 
-import com.example.trivia.dto.JoinRoomRequest;
-import com.example.trivia.dto.JoinRoomResponse;
 import com.example.trivia.dto.RoomCreationRequest;
+import com.example.trivia.dto.RoomJoinRequest;
+import com.example.trivia.dto.RoomJoinResponse;
 import com.example.trivia.model.Player;
 import com.example.trivia.model.Room;
 import com.example.trivia.repository.PlayerRepository;
@@ -106,13 +106,13 @@ class RoomControllerTest {
     
     @Test
     void joinRoom_createsNewPlayerAndReturns201() {
-        JoinRoomRequest joinRequest = new JoinRoomRequest("TEST123", "testUser");
+        RoomJoinRequest joinRequest = new RoomJoinRequest("TEST123", "testUser");
         when(jwtKeyLocator.locate(any())).thenReturn(
             Keys.hmacShaKeyFor("test-secret-key-1234567890123456".getBytes(StandardCharsets.UTF_8)));
         when(roomRepo.findById(1L)).thenReturn(Optional.of(testRoom));
         when(playerRepo.save(any(Player.class))).thenReturn(testPlayer);
         
-        ResponseEntity<JoinRoomResponse> response = controller.joinRoom(1L, joinRequest);
+        ResponseEntity<RoomJoinResponse> response = controller.joinRoom(1L, joinRequest);
         
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -123,7 +123,7 @@ class RoomControllerTest {
     
     @Test
     void joinRoom_throws404WhenRoomNotFound() {
-        JoinRoomRequest joinRequest = new JoinRoomRequest("TEST123", "testUser");
+        RoomJoinRequest joinRequest = new RoomJoinRequest("TEST123", "testUser");
         when(roomRepo.findById(1L)).thenReturn(Optional.empty());
         
         assertThrows(ResponseStatusException.class, () -> {
@@ -135,7 +135,7 @@ class RoomControllerTest {
     
     @Test
     void joinRoom_throws400WhenInvalidCode() {
-        JoinRoomRequest joinRequest = new JoinRoomRequest("INVALID", "testUser");
+        RoomJoinRequest joinRequest = new RoomJoinRequest("INVALID", "testUser");
         when(roomRepo.findById(1L)).thenReturn(Optional.of(testRoom));
         
         assertThrows(ResponseStatusException.class, () -> {

@@ -20,9 +20,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.trivia.dto.JoinRoomRequest;
-import com.example.trivia.dto.JoinRoomResponse;
 import com.example.trivia.dto.RoomCreationRequest;
+import com.example.trivia.dto.RoomJoinRequest;
+import com.example.trivia.dto.RoomJoinResponse;
 import com.example.trivia.model.Player;
 import com.example.trivia.model.Room;
 import com.example.trivia.model.Team;
@@ -87,7 +87,7 @@ public class RoomController {
     }
 
     @PostMapping("/rooms/{roomId}/players")
-    public ResponseEntity<JoinRoomResponse> joinRoom(@PathVariable Long roomId, @RequestBody JoinRoomRequest body) {
+    public ResponseEntity<RoomJoinResponse> joinRoom(@PathVariable Long roomId, @RequestBody RoomJoinRequest body) {
         Room room = roomRepo.findById(roomId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
@@ -114,7 +114,7 @@ public class RoomController {
                 .compact();
 
         URI location = URI.create("/rooms/" + roomId + "/players/" + player.getPlayerId());
-        return ResponseEntity.created(location).body(new JoinRoomResponse(player, jwt));
+        return ResponseEntity.created(location).body(new RoomJoinResponse(player, jwt));
     }
 
     @GetMapping("/rooms/{roomId}/players")
