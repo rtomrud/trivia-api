@@ -209,18 +209,6 @@ public class RoomController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/rooms/{roomId}/teams/{teamId}/players")
-    public ResponseEntity<List<Player>> getTeamPlayers(@PathVariable Long roomId, @PathVariable Long teamId) {
-        roomRepo.findById(roomId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
-
-        teamRepo.findById(teamId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Team not found"));
-
-        List<Player> players = playerRepo.findByTeamId(teamId);
-        return ResponseEntity.ok(players);
-    }
-
     @PutMapping("/rooms/{roomId}/teams/{teamId}/players/{playerId}")
     public ResponseEntity<Void> assignPlayerToTeam(
             @PathVariable Long roomId,

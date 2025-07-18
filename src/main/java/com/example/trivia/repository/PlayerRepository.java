@@ -10,6 +10,4 @@ import com.example.trivia.model.Player;
 @Repository
 public interface PlayerRepository extends CrudRepository<Player, Long> {
     List<Player> findByRoomId(Long roomId);
-
-    List<Player> findByTeamId(Long teamId);
 }

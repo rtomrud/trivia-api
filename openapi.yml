@@ -228,33 +228,6 @@ paths:
         "404":
           description: Room or team not found
 
-  /rooms/{roomId}/teams/{teamId}/players:
-    get:
-      summary: Get the players of a team
-      operationId: getTeamPlayers
-      parameters:
-        - name: roomId
-          in: path
-          required: true
-          schema:
-            type: integer
-        - name: teamId
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: Players retrieved
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Player"
-        "404":
-          description: Room or team not found
-
   /rooms/{roomId}/teams/{teamId}/players/{playerId}:
     put:
       summary: Assign a player to a team
