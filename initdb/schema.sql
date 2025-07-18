@@ -54,6 +54,5 @@ CREATE TABLE answers (
     question_id BIGINT NOT NULL REFERENCES questions(question_id),
     player_id BIGINT NOT NULL REFERENCES players(player_id),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    answer TEXT NOT NULL,
-    correct BOOLEAN NULL
+    answer TEXT NOT NULL
 );

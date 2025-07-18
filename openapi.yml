@@ -650,7 +650,4 @@ components:
           type: integer
         answer:
           type: string
-        correct:
-          type: boolean
-          nullable: true # null if round has not ended
 

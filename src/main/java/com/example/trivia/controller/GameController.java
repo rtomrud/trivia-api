@@ -202,8 +202,12 @@ public class GameController {
         }
 
         List<Question> questions = questionRepo.findByRoundId(roundId);
-        for (Question question : questions) {
-            question.setCorrectAnswers(null); // Don't show correct answers until round is over
+
+        // Don't show correct answers until round is over
+        if (Instant.now().isBefore(round.getEndedAt())) {
+            for (Question question : questions) {
+                question.setCorrectAnswers(null);
+            }
         }
 
         return ResponseEntity.ok(questions);
@@ -222,7 +226,7 @@ public class GameController {
         Round round = roundRepo.findById(roundId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Round not found"));
 
-        Question question = questionRepo.findById(questionId)
+        questionRepo.findById(questionId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found"));
 
         Long currentPlayerId = (Long) request.getAttribute("playerId");
@@ -248,8 +252,6 @@ public class GameController {
         answer.setPlayerId(currentPlayer.getPlayerId());
         answer.setAnswer(body.answer());
         answer.setCreatedAt(Instant.now());
-        answer.setCorrect(question.getCorrectAnswers().stream()
-                .anyMatch(correctAnswer -> answer.getAnswer().equalsIgnoreCase(correctAnswer)));
         answerRepo.save(answer);
         return ResponseEntity.ok().build();
     }

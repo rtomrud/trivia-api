@@ -14,7 +14,6 @@ public class Answer {
     private Long playerId;
     private Instant createdAt;
     private String answer;
-    private Boolean correct; // nullable
 
     public Answer() {
     }
@@ -65,13 +64,5 @@ public class Answer {
 
     public void setAnswer(String answer) {
         this.answer = answer;
-    }
-
-    public Boolean isCorrect() {
-        return correct;
-    }
-
-    public void setCorrect(Boolean correct) {
-        this.correct = correct;
     }
 }
