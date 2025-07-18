@@ -232,10 +232,6 @@ public class GameController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found"));
 
         Long currentPlayerId = (Long) request.getAttribute("playerId");
-        if (currentPlayerId == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
-        }
-
         Player currentPlayer = playerRepo.findById(currentPlayerId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated"));
 
