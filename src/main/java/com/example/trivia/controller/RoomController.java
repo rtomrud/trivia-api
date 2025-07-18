@@ -4,6 +4,7 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import io.jsonwebtoken.Jwts;
 
@@ -61,9 +62,16 @@ public class RoomController {
     }
 
     @GetMapping("/rooms/{roomId}")
-    public ResponseEntity<Room> getRoom(@PathVariable Long roomId) {
+    public ResponseEntity<Room> getRoom(@PathVariable Long roomId, HttpServletRequest request) {
         Room room = roomRepo.findById(roomId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
+
+        // Don't return the secret code if the player isn't in the room
+        Long currentPlayerId = (Long) request.getAttribute("playerId");
+        Player player = playerRepo.findById(currentPlayerId).orElse(new Player());
+        if (!player.getRoomId().equals(roomId)) {
+            room.setCode(null);
+        }
 
         return ResponseEntity.ok(room);
     }

@@ -537,6 +537,7 @@ components:
           format: date-time
         code:
           type: string
+          nullable: true # null if current player is not in the room
 
     Team:
       type: object

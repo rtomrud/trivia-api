@@ -84,9 +84,10 @@ class RoomControllerTest {
     
     @Test
     void getRoom_returnsRoomWhenFound() {
+        HttpServletRequest request = mock(HttpServletRequest.class);
         when(roomRepo.findById(1L)).thenReturn(Optional.of(testRoom));
         
-        ResponseEntity<Room> response = controller.getRoom(1L);
+        ResponseEntity<Room> response = controller.getRoom(1L, request);
         
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(testRoom, response.getBody());
@@ -95,10 +96,11 @@ class RoomControllerTest {
     
     @Test
     void getRoom_throws404WhenRoomNotFound() {
+        HttpServletRequest request = mock(HttpServletRequest.class);
         when(roomRepo.findById(1L)).thenReturn(Optional.empty());
         
         assertThrows(ResponseStatusException.class, () -> {
-            controller.getRoom(1L);
+            controller.getRoom(1L, request);
         });
         
         verify(roomRepo, times(1)).findById(1L);
