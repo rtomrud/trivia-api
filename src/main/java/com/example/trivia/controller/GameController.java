@@ -125,7 +125,6 @@ public class GameController {
         for (int roundNumber = 1; roundNumber <= body.rounds(); roundNumber++) {
             Round round = new Round();
             round.setGameId(game.getGameId());
-            round.setRoundNumber(roundNumber);
             round.setCreatedAt(Instant.now().plus(Duration.ofSeconds(body.timePerRound() * (roundNumber - 1))));
             round.setEndedAt(round.getCreatedAt().plus(Duration.ofSeconds(body.timePerRound())));
             round = roundRepo.save(round);

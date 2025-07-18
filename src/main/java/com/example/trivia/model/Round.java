@@ -10,7 +10,6 @@ public class Round {
     @Id
     private Long roundId;
     private Long gameId;
-    private Integer roundNumber;
     private Instant createdAt;
     private Instant endedAt;
 
@@ -31,14 +30,6 @@ public class Round {
 
     public void setGameId(Long gameId) {
         this.gameId = gameId;
-    }
-
-    public Integer getRoundNumber() {
-        return roundNumber;
-    }
-
-    public void setRoundNumber(Integer roundNumber) {
-        this.roundNumber = roundNumber;
     }
 
     public Instant getCreatedAt() {
