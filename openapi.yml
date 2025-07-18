@@ -505,6 +505,10 @@ paths:
       responses:
         "200":
           description: Answer submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Answer"
         "401":
           description: Player not authenticated
         "403":

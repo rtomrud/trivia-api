@@ -216,7 +216,7 @@ public class GameController {
     }
 
     @PostMapping("/games/{gameId}/rounds/{roundId}/questions/{questionId}")
-    public ResponseEntity<Void> submitAnswer(
+    public ResponseEntity<Answer> submitAnswer(
             @PathVariable Long gameId,
             @PathVariable Long roundId,
             @PathVariable Long questionId,
@@ -254,8 +254,8 @@ public class GameController {
         answer.setPlayerId(currentPlayer.getPlayerId());
         answer.setAnswer(body.answer());
         answer.setCreatedAt(Instant.now());
-        answerRepo.save(answer);
-        return ResponseEntity.ok().build();
+        answer = answerRepo.save(answer);
+        return ResponseEntity.ok(answer);
     }
 
     @GetMapping("/games/{gameId}/rounds/{roundId}/questions/{questionId}")
