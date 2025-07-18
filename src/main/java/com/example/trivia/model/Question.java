@@ -12,8 +12,8 @@ public class Question {
     private String type;
     private String question;
     private String mediaUrl; // nullable
-    private List<String> options; // nullable
-    private List<String> correctAnswers; // nullable
+    private List<String> options;
+    private List<String> correctAnswers;
 
     public Question() {
     }

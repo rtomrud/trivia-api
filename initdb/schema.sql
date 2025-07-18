@@ -38,8 +38,8 @@ CREATE TABLE questions (
     type VARCHAR(255) NOT NULL,
     question TEXT NOT NULL,
     media_url TEXT NULL,
-    options TEXT[] NULL,
-    correct_answers TEXT[] NULL
+    options TEXT[] NOT NULL,
+    correct_answers TEXT[] NOT NULL
 );
 
 CREATE TABLE round_questions (

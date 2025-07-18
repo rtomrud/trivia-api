@@ -3,6 +3,7 @@ package com.example.trivia.controller;
 import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -206,7 +207,8 @@ public class GameController {
         // Don't show correct answers until round is over
         if (Instant.now().isBefore(round.getEndedAt())) {
             for (Question question : questions) {
-                question.setCorrectAnswers(null);
+                List<String> correctAnswers = new ArrayList<>();
+                question.setCorrectAnswers(correctAnswers);
             }
         }
 
