@@ -97,7 +97,6 @@ class GameControllerTest {
         testRound = new Round();
         testRound.setRoundId(1L);
         testRound.setGameId(1L);
-        testRound.setRoundNumber(1);
         testRound.setCreatedAt(Instant.now());
         testRound.setEndedAt(Instant.now().plus(Duration.ofMinutes(10)));
     }
@@ -255,12 +254,10 @@ class GameControllerTest {
         Round round1 = new Round();
         round1.setRoundId(1L);
         round1.setGameId(1L);
-        round1.setRoundNumber(1);
         
         Round round2 = new Round();
         round2.setRoundId(2L);
         round2.setGameId(1L);
-        round2.setRoundNumber(2);
         
         when(gameRepo.findById(1L)).thenReturn(Optional.of(testGame));
         when(roundRepo.findByGameId(1L)).thenReturn(Arrays.asList(round1, round2));
@@ -290,7 +287,6 @@ class GameControllerTest {
         Round round = new Round();
         round.setRoundId(1L);
         round.setGameId(1L);
-        round.setRoundNumber(1);
         round.setCreatedAt(Instant.now().plus(Duration.ofMinutes(10)));
         
         when(gameRepo.findById(1L)).thenReturn(Optional.of(testGame));

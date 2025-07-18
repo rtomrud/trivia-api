@@ -599,9 +599,6 @@ components:
         endedAt:
           type: string
           format: date-time
-        roundCount:
-          type: integer
-          minimum: 1
 
     Round:
       type: object
@@ -616,9 +613,6 @@ components:
         endedAt:
           type: string
           format: date-time
-        questionCount:
-          type: integer
-          minimum: 1
 
     Question:
       type: object
