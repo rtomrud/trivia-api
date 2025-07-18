@@ -541,7 +541,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Answer"
+                type: array
+                items:
+                  $ref: "#/components/schemas/Answer"
         "403":
           description: Round has not ended yet
         "404":
