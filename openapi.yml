@@ -50,6 +50,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Room"
+        "403":
+          description: Player not authenticated
         "404":
           description: Room not found
 

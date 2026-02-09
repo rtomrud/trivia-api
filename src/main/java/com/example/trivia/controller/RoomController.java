@@ -66,12 +66,15 @@ public class RoomController {
         Room room = roomRepo.findById(roomId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
+        Long currentPlayerId = (Long) request.getAttribute("playerId");
+        if (currentPlayerId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
+        }
+
         // Don't return the secret code if the player isn't in the room
-        // Long currentPlayerId = (Long) request.getAttribute("playerId");
-        // Player player = playerRepo.findById(currentPlayerId).orElse(new Player());
-        // if (!player.getRoomId().equals(roomId)) {
-        //     room.setCode(null);
-        // }
+        if (!room.getHostId().equals(currentPlayerId)) {
+            room.setCode(null);
+        }
 
         return ResponseEntity.ok(room);
     }
