@@ -8,7 +8,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("rounds")
 public class Round {
     @Id
-    private Long roundId;
+    private Long id;
     private Long gameId;
     private Instant createdAt;
     private Instant endedAt;
@@ -16,12 +16,12 @@ public class Round {
     public Round() {
     }
 
-    public Long getRoundId() {
-        return roundId;
+    public Long getId() {
+        return id;
     }
 
-    public void setRoundId(Long roundId) {
-        this.roundId = roundId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getGameId() {

@@ -8,7 +8,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("games")
 public class Game {
     @Id
-    private Long gameId;
+    private Long id;
     private Long roomId;
     private Instant createdAt;
     private Instant endedAt;
@@ -16,12 +16,12 @@ public class Game {
     public Game() {
     }
 
-    public Long getGameId() {
-        return gameId;
+    public Long getId() {
+        return id;
     }
 
-    public void setGameId(Long gameId) {
-        this.gameId = gameId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getRoomId() {

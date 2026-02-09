@@ -527,7 +527,7 @@ components:
     Room:
       type: object
       properties:
-        roomId:
+        id:
           type: integer
         hostId:
           type: integer
@@ -542,7 +542,7 @@ components:
     Team:
       type: object
       properties:
-        teamId:
+        id:
           type: integer
         roomId:
           type: integer
@@ -550,7 +550,7 @@ components:
     Player:
       type: object
       properties:
-        playerId:
+        id:
           type: integer
         roomId:
           type: integer
@@ -563,7 +563,7 @@ components:
     Game:
       type: object
       properties:
-        gameId:
+        id:
           type: integer
         roomId:
           type: integer
@@ -577,7 +577,7 @@ components:
     Round:
       type: object
       properties:
-        roundId:
+        id:
           type: integer
         gameId:
           type: integer
@@ -591,7 +591,7 @@ components:
     Question:
       type: object
       properties:
-        questionId:
+        id:
           type: integer
         type:
           type: string
@@ -612,7 +612,7 @@ components:
     Answer:
       type: object
       properties:
-        answerId:
+        id:
           type: integer
         roundId:
           type: integer

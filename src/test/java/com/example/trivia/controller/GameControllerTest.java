@@ -76,26 +76,26 @@ class GameControllerTest {
     @BeforeEach
     void setUp() {
         testGame = new Game();
-        testGame.setGameId(1L);
+        testGame.setId(1L);
         testGame.setRoomId(1L);
         testGame.setCreatedAt(Instant.now());
         
         testRoom = new Room();
-        testRoom.setRoomId(1L);
+        testRoom.setId(1L);
         testRoom.setHostId(1L);
         
         testPlayer = new Player();
-        testPlayer.setPlayerId(1L);
+        testPlayer.setId(1L);
         testPlayer.setRoomId(1L);
         testPlayer.setUsername("testUser");
         
         testQuestion = new Question();
-        testQuestion.setQuestionId(1L);
+        testQuestion.setId(1L);
         testQuestion.setType("multiple_choice");
         testQuestion.setQuestion("Test question");
         
         testRound = new Round();
-        testRound.setRoundId(1L);
+        testRound.setId(1L);
         testRound.setGameId(1L);
         testRound.setCreatedAt(Instant.now());
         testRound.setEndedAt(Instant.now().plus(Duration.ofMinutes(10)));
@@ -104,11 +104,11 @@ class GameControllerTest {
     @Test
     void getGames_returnsGamesList() throws Exception {
         Game game1 = new Game();
-        game1.setGameId(1L);
+        game1.setId(1L);
         game1.setRoomId(1L);
         
         Game game2 = new Game();
-        game2.setGameId(2L);
+        game2.setId(2L);
         game2.setRoomId(1L);
         
         Page<Game> gamesPage = new PageImpl<>(Arrays.asList(game1, game2), PageRequest.of(0, 10), 2);
@@ -131,7 +131,7 @@ class GameControllerTest {
         when(roomRepo.findById(1L)).thenReturn(Optional.of(testRoom));
         
         Game savedGame = new Game();
-        savedGame.setGameId(1L);
+        savedGame.setId(1L);
         savedGame.setRoomId(1L);
         savedGame.setCreatedAt(Instant.now());
         savedGame.setEndedAt(savedGame.getCreatedAt().plus(Duration.ofMinutes(120))); // 2 rounds * 60 seconds
@@ -141,8 +141,8 @@ class GameControllerTest {
         
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(savedGame.getGameId(), response.getBody().getGameId());
-        assertEquals(1L, response.getBody().getRoomId());
+        assertEquals(savedGame.getId(), response.getBody().getId());
+        assertEquals(1L, response.getBody().getId());
         assertNotNull(response.getBody().getCreatedAt());
         assertNotNull(response.getBody().getEndedAt());
         
@@ -252,11 +252,11 @@ class GameControllerTest {
     @Test
     void getRounds_returnsRoundsList() {
         Round round1 = new Round();
-        round1.setRoundId(1L);
+        round1.setId(1L);
         round1.setGameId(1L);
         
         Round round2 = new Round();
-        round2.setRoundId(2L);
+        round2.setId(2L);
         round2.setGameId(1L);
         
         when(gameRepo.findById(1L)).thenReturn(Optional.of(testGame));
@@ -285,7 +285,7 @@ class GameControllerTest {
     @Test
     void getRoundQuestions_throws403WhenRoundNotStarted() {
         Round round = new Round();
-        round.setRoundId(1L);
+        round.setId(1L);
         round.setGameId(1L);
         round.setCreatedAt(Instant.now().plus(Duration.ofMinutes(10)));
         

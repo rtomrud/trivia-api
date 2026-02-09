@@ -8,7 +8,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("answers")
 public class Answer {
     @Id
-    private Long answerId;
+    private Long id;
     private Long roundId;
     private Long questionId;
     private Long playerId;
@@ -18,12 +18,12 @@ public class Answer {
     public Answer() {
     }
 
-    public Long getAnswerId() {
-        return answerId;
+    public Long getId() {
+        return id;
     }
 
-    public void setAnswerId(Long answerId) {
-        this.answerId = answerId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getRoundId() {

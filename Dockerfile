@@ -1,24 +1,24 @@
 # syntax=docker/dockerfile:1
 
-FROM eclipse-temurin:21-jdk-jammy as base
+FROM eclipse-temurin:21-jdk-jammy AS base
 WORKDIR /build
 COPY --chmod=0755 mvnw mvnw
 COPY .mvn/ .mvn/
 
-FROM base as test
+FROM base AS test
 WORKDIR /build
 COPY ./src src/
 RUN --mount=type=bind,source=pom.xml,target=pom.xml \
     --mount=type=cache,target=/root/.m2 \
     ./mvnw test
 
-FROM base as deps
+FROM base AS deps
 WORKDIR /build
 RUN --mount=type=bind,source=pom.xml,target=pom.xml \
     --mount=type=cache,target=/root/.m2 \
     ./mvnw dependency:go-offline -DskipTests
 
-FROM deps as package
+FROM deps AS package
 WORKDIR /build
 COPY ./src src/
 RUN --mount=type=bind,source=pom.xml,target=pom.xml \
@@ -26,11 +26,11 @@ RUN --mount=type=bind,source=pom.xml,target=pom.xml \
     ./mvnw package -DskipTests && \
     mv target/$(./mvnw help:evaluate -Dexpression=project.artifactId -q -DforceStdout)-$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout).jar target/app.jar
 
-FROM package as extract
+FROM package AS extract
 WORKDIR /build
 RUN java -Djarmode=layertools -jar target/app.jar extract --destination target/extracted
 
-FROM extract as development
+FROM extract AS development
 WORKDIR /build
 RUN cp -r /build/target/extracted/dependencies/. ./
 RUN cp -r /build/target/extracted/spring-boot-loader/. ./

@@ -6,18 +6,18 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("teams")
 public class Team {
     @Id
-    private Long teamId;
+    private Long id;
     private Long roomId;
 
     public Team() {
     }
 
-    public Long getTeamId() {
-        return teamId;
+    public Long getId() {
+        return id;
     }
 
-    public void setTeamId(Long teamId) {
-        this.teamId = teamId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getRoomId() {

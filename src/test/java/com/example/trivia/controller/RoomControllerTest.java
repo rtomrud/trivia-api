@@ -57,12 +57,12 @@ class RoomControllerTest {
     @BeforeEach
     void setUp() {
         testRoom = new Room();
-        testRoom.setRoomId(1L);
+        testRoom.setId(1L);
         testRoom.setCode("TEST123");
         testRoom.setCreatedAt(Instant.now());
         
         testPlayer = new Player();
-        testPlayer.setPlayerId(1L);
+        testPlayer.setId(1L);
         testPlayer.setUsername("testUser");
         testPlayer.setRoomId(1L);
     }
@@ -77,7 +77,7 @@ class RoomControllerTest {
         
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(testRoom.getRoomId(), response.getBody().getRoomId());
+        assertEquals(testRoom.getId(), response.getBody().getId());
         verify(roomRepo, times(1)).save(any(Room.class));
         verify(roomRepo, times(1)).save(argThat(room -> "TEST123".equals(room.getCode())));
     }
@@ -118,7 +118,7 @@ class RoomControllerTest {
         
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(testPlayer.getPlayerId(), response.getBody().player().getPlayerId());
+        assertEquals(testPlayer.getId(), response.getBody().player().getId());
         verify(roomRepo, times(1)).findById(1L);
         verify(playerRepo, times(1)).save(any(Player.class));
     }

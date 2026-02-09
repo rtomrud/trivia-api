@@ -124,7 +124,7 @@ public class GameController {
 
         for (int roundNumber = 1; roundNumber <= body.rounds(); roundNumber++) {
             Round round = new Round();
-            round.setGameId(game.getGameId());
+            round.setGameId(game.getId());
             round.setCreatedAt(Instant.now().plus(Duration.ofSeconds(body.timePerRound() * (roundNumber - 1))));
             round.setEndedAt(round.getCreatedAt().plus(Duration.ofSeconds(body.timePerRound())));
             round = roundRepo.save(round);
@@ -132,22 +132,22 @@ public class GameController {
             for (int questionNumber = 1; questionNumber <= body.questionsPerRound(); questionNumber++) {
                 // Find a random question, based on the game's settings
                 Question question = null;
-                while (question == null || questionIds.contains(question.getQuestionId())) {
+                while (question == null || questionIds.contains(question.getId())) {
                     Pageable pageable = PageRequest.of((int) (Math.random() * questionCount), 1);
                     question = questionRepo.findAll(pageable).getContent().get(0);
                 }
 
                 // Store questionId to avoid repeating questions
-                questionIds.add(question.getQuestionId());
+                questionIds.add(question.getId());
 
                 RoundQuestion roundQuestion = new RoundQuestion();
-                roundQuestion.setRoundId(round.getRoundId());
-                roundQuestion.setQuestionId(question.getQuestionId());
+                roundQuestion.setRoundId(round.getId());
+                roundQuestion.setQuestionId(question.getId());
                 roundQuestionRepo.save(roundQuestion);
             }
         }
 
-        URI location = URI.create("/games/" + game.getGameId());
+        URI location = URI.create("/games/" + game.getId());
         return ResponseEntity.created(location).body(game);
     }
 
@@ -246,7 +246,7 @@ public class GameController {
                 .orElse(new Answer());
         answer.setRoundId(roundId);
         answer.setQuestionId(questionId);
-        answer.setPlayerId(currentPlayer.getPlayerId());
+        answer.setPlayerId(currentPlayer.getId());
         answer.setAnswer(body.answer());
         answer.setCreatedAt(Instant.now());
         answer = answerRepo.save(answer);

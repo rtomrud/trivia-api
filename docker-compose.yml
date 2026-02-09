@@ -4,7 +4,7 @@ services:
       context: .
       target: development
     ports:
-      - 8080:8080
+      - 8083:8080
     depends_on:
       db:
         condition: service_healthy
@@ -17,14 +17,14 @@ services:
           path: .
 
   db:
-    image: postgres:16.3-alpine
+    image: postgres:17
     restart: unless-stopped
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-    ports:
-      - 5432:5432
+    # ports:
+      # - 5432:5432
     volumes:
       - db-data:/var/lib/postgresql/data
       - ./initdb:/docker-entrypoint-initdb.d
@@ -42,7 +42,7 @@ services:
       - PGADMIN_DEFAULT_EMAIL=postgres@example.com
       - PGADMIN_DEFAULT_PASSWORD=postgres
     ports:
-      - 8081:80
+      - 8084:80
     depends_on:
       db:
         condition: service_healthy

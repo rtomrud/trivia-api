@@ -6,7 +6,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("players")
 public class Player {
     @Id
-    private Long playerId;
+    private Long id;
     private Long roomId;
     private Long teamId; // nullable (not assigned by default)
     private String username;
@@ -14,12 +14,12 @@ public class Player {
     public Player() {
     }
 
-    public Long getPlayerId() {
-        return playerId;
+    public Long getId() {
+        return id;
     }
 
-    public void setPlayerId(Long playerId) {
-        this.playerId = playerId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getRoomId() {

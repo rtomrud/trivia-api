@@ -57,7 +57,7 @@ public class RoomController {
         room.setCode(body.code());
         room = roomRepo.save(room);
 
-        URI roomUrl = URI.create("/rooms/" + room.getRoomId());
+        URI roomUrl = URI.create("/rooms/" + room.getId());
         return ResponseEntity.created(roomUrl).body(room);
     }
 
@@ -67,11 +67,11 @@ public class RoomController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
         // Don't return the secret code if the player isn't in the room
-        Long currentPlayerId = (Long) request.getAttribute("playerId");
-        Player player = playerRepo.findById(currentPlayerId).orElse(new Player());
-        if (!player.getRoomId().equals(roomId)) {
-            room.setCode(null);
-        }
+        // Long currentPlayerId = (Long) request.getAttribute("playerId");
+        // Player player = playerRepo.findById(currentPlayerId).orElse(new Player());
+        // if (!player.getRoomId().equals(roomId)) {
+        //     room.setCode(null);
+        // }
 
         return ResponseEntity.ok(room);
     }
@@ -110,18 +110,18 @@ public class RoomController {
 
         // First player to join becomes the host
         if (playerRepo.findByRoomId(roomId).size() == 1) {
-            room.setHostId(player.getPlayerId());
+            room.setHostId(player.getId());
             roomRepo.save(room);
         }
 
         String jwt = Jwts.builder()
-                .subject(player.getPlayerId().toString())
+                .subject(player.getId().toString())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 86400000))
                 .signWith(this.jwtKeyLocator.locate(null))
                 .compact();
 
-        URI location = URI.create("/rooms/" + roomId + "/players/" + player.getPlayerId());
+        URI location = URI.create("/rooms/" + roomId + "/players/" + player.getId());
         return ResponseEntity.created(location).body(new RoomJoinResponse(player, jwt));
     }
 
@@ -156,10 +156,10 @@ public class RoomController {
         if (room.getHostId().equals(currentPlayerId)) {
             playerRepo.findByRoomId(roomId)
                     .stream()
-                    .filter(player -> !player.getPlayerId().equals(playerId))
+                    .filter(player -> !player.getId().equals(playerId))
                     .findFirst()
                     .ifPresent(player -> {
-                        room.setHostId(player.getPlayerId());
+                        room.setHostId(player.getId());
                         roomRepo.save(room);
                     });
         }
@@ -185,7 +185,7 @@ public class RoomController {
         team.setRoomId(roomId);
         team = teamRepo.save(team);
 
-        URI location = URI.create("/rooms/" + roomId + "/teams/" + team.getTeamId());
+        URI location = URI.create("/rooms/" + roomId + "/teams/" + team.getId());
         return ResponseEntity.created(location).body(team);
     }
 

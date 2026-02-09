@@ -8,7 +8,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("questions")
 public class Question {
     @Id
-    private Long questionId;
+    private Long id;
     private String type;
     private String question;
     private String mediaUrl; // nullable
@@ -18,12 +18,12 @@ public class Question {
     public Question() {
     }
 
-    public Long getQuestionId() {
-        return questionId;
+    public Long getId() {
+        return id;
     }
 
-    public void setQuestionId(Long questionId) {
-        this.questionId = questionId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getType() {
