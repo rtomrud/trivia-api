@@ -21,16 +21,3 @@ docker compose up
 - R09. After a round ends, a player can see the answer of each player to each question of that round.
 - R10. A player can see the score (based on the amount of correct answers) earned by each player and team.
 
-## Question templates
-
-- Which movie was released first? (multiple-choice)
-- Which movie features [person] and [person]? (multiple-choice)
-- Who stars in [movie]? (multiple-choice)
-- Who does not star in [movie]? (multiple-choice)
-- Who played [character] in [movie]?
-- Which character did [person] play in [movie]?
-- Which character is this? (image/video)
-- Which movie is this scene from? (image/video)
-- Which movie is this quote from? (audio)
-- Which movie is this song from? (audio)
-
