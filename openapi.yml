@@ -4,9 +4,7 @@ info:
   description: API for a trivia game
   version: 1.0.0
 servers:
-  - url: https://trivia-api.artemrudenko.com
-    description: Production server
-  - url: http://localhost:8080
+  - url: http://localhost:8083
     description: Development server
 
 paths:
