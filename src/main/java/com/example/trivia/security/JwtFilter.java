@@ -41,7 +41,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 Long playerId = Long.parseLong(claims.getSubject());
                 request.setAttribute("playerId", playerId);
-                System.out.printf("playerId: %d", playerId);
             } catch (JwtException e) {
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 response.getWriter().write("Unauthorized: " + e.getMessage());
