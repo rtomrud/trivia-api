@@ -1,5 +1,6 @@
 package com.example.trivia.controller;
 
+import com.example.trivia.component.JwtKeyLocator;
 import com.example.trivia.dto.RoomCreationRequest;
 import com.example.trivia.dto.RoomJoinRequest;
 import com.example.trivia.dto.RoomJoinResponse;
@@ -8,7 +9,6 @@ import com.example.trivia.model.Room;
 import com.example.trivia.repository.PlayerRepository;
 import com.example.trivia.repository.RoomRepository;
 import com.example.trivia.repository.TeamRepository;
-import com.example.trivia.security.JwtKeyLocator;
 
 import io.jsonwebtoken.security.Keys;
 

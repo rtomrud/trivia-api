@@ -1,4 +1,4 @@
-package com.example.trivia.security;
+package com.example.trivia.component;
 
 import java.io.IOException;
 

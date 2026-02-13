@@ -1,4 +1,4 @@
-package com.example.trivia.security;
+package com.example.trivia.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

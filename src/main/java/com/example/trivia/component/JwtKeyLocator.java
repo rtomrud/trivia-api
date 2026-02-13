@@ -1,4 +1,4 @@
-package com.example.trivia.security;
+package com.example.trivia.component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;

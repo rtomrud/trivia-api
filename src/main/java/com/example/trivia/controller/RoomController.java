@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.example.trivia.component.JwtKeyLocator;
 import com.example.trivia.dto.RoomCreationRequest;
 import com.example.trivia.dto.RoomJoinRequest;
 import com.example.trivia.dto.RoomJoinResponse;
@@ -31,27 +32,26 @@ import com.example.trivia.model.Team;
 import com.example.trivia.repository.PlayerRepository;
 import com.example.trivia.repository.RoomRepository;
 import com.example.trivia.repository.TeamRepository;
-import com.example.trivia.security.JwtKeyLocator;
 import com.example.trivia.service.SseService;
 
 @RestController
 public class RoomController {
+    private final JwtKeyLocator jwtKeyLocator;
     private final PlayerRepository playerRepo;
     private final RoomRepository roomRepo;
     private final TeamRepository teamRepo;
-    private final JwtKeyLocator jwtKeyLocator;
     private final SseService sseService;
 
     public RoomController(
+            JwtKeyLocator jwtKeyLocator,
             PlayerRepository playerRepo,
             RoomRepository roomRepo,
             TeamRepository teamRepo,
-            JwtKeyLocator jwtKeyLocator,
             SseService sseService) {
+        this.jwtKeyLocator = jwtKeyLocator;
         this.playerRepo = playerRepo;
         this.roomRepo = roomRepo;
         this.teamRepo = teamRepo;
-        this.jwtKeyLocator = jwtKeyLocator;
         this.sseService = sseService;
     }
 
