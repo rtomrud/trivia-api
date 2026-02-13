@@ -55,5 +55,15 @@ services:
       db:
         condition: service_healthy
 
+  redis:
+    image: redis:8
+    restart: unless-stopped
+    # ports:
+    #   - 6379:6379
+    command: redis-server --save 20 1 --loglevel warning --requirepass redis
+    volumes:
+      - redis-data:/data
+
 volumes:
   db-data:
+  redis-data:

@@ -41,6 +41,7 @@ import com.example.trivia.repository.QuestionRepository;
 import com.example.trivia.repository.RoomRepository;
 import com.example.trivia.repository.RoundQuestionRepository;
 import com.example.trivia.repository.RoundRepository;
+import com.example.trivia.service.SseService;
 import com.example.trivia.util.LinkHeaderBuilder;
 
 @RestController
@@ -52,6 +53,7 @@ public class GameController {
     private final RoomRepository roomRepo;
     private final RoundQuestionRepository roundQuestionRepo;
     private final RoundRepository roundRepo;
+    private final SseService sseService;
 
     public GameController(
             AnswerRepository answerRepo,
@@ -60,7 +62,8 @@ public class GameController {
             QuestionRepository questionRepo,
             RoomRepository roomRepo,
             RoundQuestionRepository roundQuestionRepo,
-            RoundRepository roundRepo) {
+            RoundRepository roundRepo,
+            SseService sseService) {
         this.answerRepo = answerRepo;
         this.gameRepo = gameRepo;
         this.playerRepo = playerRepo;
@@ -68,6 +71,7 @@ public class GameController {
         this.roomRepo = roomRepo;
         this.roundQuestionRepo = roundQuestionRepo;
         this.roundRepo = roundRepo;
+        this.sseService = sseService;
     }
 
     @GetMapping("/games")
@@ -148,6 +152,7 @@ public class GameController {
         }
 
         URI location = URI.create("/games/" + game.getId());
+        sseService.publish(room.getId().toString(), "game-created", game.getId());
         return ResponseEntity.created(location).body(game);
     }
 
@@ -177,6 +182,7 @@ public class GameController {
         }
 
         gameRepo.deleteById(gameId);
+        sseService.publish(room.getId().toString(), "game-deleted", game.getId());
         return ResponseEntity.noContent().build();
     }
 
@@ -250,6 +256,7 @@ public class GameController {
         answer.setAnswer(body.answer());
         answer.setCreatedAt(Instant.now());
         answer = answerRepo.save(answer);
+        sseService.publish(game.getRoomId().toString(), "player-submitted-answer", currentPlayerId);
         return ResponseEntity.ok(answer);
     }
 

@@ -10,6 +10,7 @@ import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.example.trivia.dto.RoomCreationRequest;
 import com.example.trivia.dto.RoomJoinRequest;
@@ -30,6 +32,7 @@ import com.example.trivia.repository.PlayerRepository;
 import com.example.trivia.repository.RoomRepository;
 import com.example.trivia.repository.TeamRepository;
 import com.example.trivia.security.JwtKeyLocator;
+import com.example.trivia.service.SseService;
 
 @RestController
 public class RoomController {
@@ -37,16 +40,19 @@ public class RoomController {
     private final RoomRepository roomRepo;
     private final TeamRepository teamRepo;
     private final JwtKeyLocator jwtKeyLocator;
+    private final SseService sseService;
 
     public RoomController(
             PlayerRepository playerRepo,
             RoomRepository roomRepo,
             TeamRepository teamRepo,
-            JwtKeyLocator jwtKeyLocator) {
+            JwtKeyLocator jwtKeyLocator,
+            SseService sseService) {
         this.playerRepo = playerRepo;
         this.roomRepo = roomRepo;
         this.teamRepo = teamRepo;
         this.jwtKeyLocator = jwtKeyLocator;
+        this.sseService = sseService;
     }
 
     @PostMapping("/rooms")
@@ -93,7 +99,29 @@ public class RoomController {
         }
 
         roomRepo.deleteById(roomId);
+        sseService.publish(roomId.toString(), "room-deleted", roomId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping(value = "/rooms/{roomId}/events", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter subscribeToRoomEvents(@PathVariable Long roomId, HttpServletRequest request) {
+        roomRepo.findById(roomId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
+
+        Long currentPlayerId = (Long) request.getAttribute("playerId");
+        if (currentPlayerId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
+        }
+
+        Player player = playerRepo.findById(currentPlayerId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found"));
+
+        if (!player.getRoomId().equals(roomId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Only players inside the room can subscribe to its events");
+        }
+
+        return sseService.subscribe(roomId.toString());
     }
 
     @PostMapping("/rooms/{roomId}/players")
@@ -124,6 +152,7 @@ public class RoomController {
                 .compact();
 
         URI location = URI.create("/rooms/" + roomId + "/players/" + player.getId());
+        sseService.publish(roomId.toString(), "player-joined", player.getId());
         return ResponseEntity.created(location).body(new RoomJoinResponse(player, jwt));
     }
 
@@ -166,6 +195,7 @@ public class RoomController {
                     });
         }
 
+        sseService.publish(roomId.toString(), "player-left", playerId);
         return ResponseEntity.noContent().build();
     }
 
@@ -188,6 +218,7 @@ public class RoomController {
         team = teamRepo.save(team);
 
         URI location = URI.create("/rooms/" + roomId + "/teams/" + team.getId());
+        sseService.publish(roomId.toString(), "team-created", team.getId());
         return ResponseEntity.created(location).body(team);
     }
 
@@ -216,6 +247,7 @@ public class RoomController {
         }
 
         teamRepo.deleteById(teamId);
+        sseService.publish(roomId.toString(), "team-deleted", teamId);
         return ResponseEntity.noContent().build();
     }
 
@@ -246,6 +278,7 @@ public class RoomController {
 
         player.setTeamId(teamId);
         playerRepo.save(player);
+        sseService.publish(roomId.toString(), "player-assigned-to-team", playerId);
         return ResponseEntity.noContent().build();
     }
 
@@ -276,6 +309,8 @@ public class RoomController {
 
         player.setTeamId(null);
         playerRepo.save(player);
+        sseService.publish(roomId.toString(), "player-removed-from-team", playerId);
         return ResponseEntity.noContent().build();
     }
+
 }

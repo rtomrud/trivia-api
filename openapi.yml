@@ -72,6 +72,22 @@ paths:
         "404":
           description: Room not found
 
+  /rooms/{roomId}/events:
+    get:
+      summary: Subscribe to server-sent events (SSEs) about the room
+      operationId: subscribeToRoomEvents
+      responses:
+        "200":
+          description: SSE stream started
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        "401":
+          description: Player not authenticated
+        "403":
+          description: Only players inside the room can subscribe to its events
+
   /rooms/{roomId}/players:
     post:
       summary: Join a room as a player
