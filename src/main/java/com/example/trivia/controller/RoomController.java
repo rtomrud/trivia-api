@@ -165,6 +165,17 @@ public class RoomController {
         return ResponseEntity.ok(players);
     }
 
+    @GetMapping("/rooms/{roomId}/players/{playerId}")
+    public ResponseEntity<Player> getPlayer(@PathVariable Long roomId, @PathVariable Long playerId) {
+        roomRepo.findById(roomId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
+
+        Player player = playerRepo.findById(playerId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found"));
+
+        return ResponseEntity.ok(player);
+    }
+
     @DeleteMapping("/rooms/{roomId}/players/{playerId}")
     public ResponseEntity<Void> deletePlayer(
             @PathVariable Long roomId,
@@ -230,6 +241,18 @@ public class RoomController {
         List<Team> teams = teamRepo.findByRoomId(roomId);
         return ResponseEntity.ok(teams);
     }
+
+    @GetMapping("/rooms/{roomId}/teams/{teamId}")
+    public ResponseEntity<Team> getTeam(@PathVariable Long roomId, @PathVariable Long teamId) {
+        roomRepo.findById(roomId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
+
+        Team team = teamRepo.findById(teamId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Team not found"));
+
+        return ResponseEntity.ok(team);
+    }
+
 
     @DeleteMapping("/rooms/{roomId}/teams/{teamId}")
     public ResponseEntity<Void> deleteTeam(@PathVariable Long roomId, @PathVariable Long teamId,

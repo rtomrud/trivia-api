@@ -158,6 +158,30 @@ paths:
           description: Room not found
 
   /rooms/{roomId}/players/{playerId}:
+    get:
+      summary: Get a player
+      operationId: getPlayer
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: playerId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Player retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Player"
+        "404":
+          description: Room or player not found
+
     delete:
       summary: Remove a player from a room
       operationId: deletePlayer
@@ -228,6 +252,30 @@ paths:
           description: Room not found
 
   /rooms/{roomId}/teams/{teamId}:
+    get:
+      summary: Get a team
+      operationId: getTeam
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Team retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Team"
+        "404":
+          description: Room or team not found
+
     delete:
       summary: Delete a team
       operationId: deleteTeam
