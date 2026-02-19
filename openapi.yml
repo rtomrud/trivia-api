@@ -71,6 +71,8 @@ paths:
           description: Only the host can delete a room
         "404":
           description: Room not found
+        "409":
+          description: Cannot delete a room with existing games
 
   /rooms/{roomId}/events:
     get:
