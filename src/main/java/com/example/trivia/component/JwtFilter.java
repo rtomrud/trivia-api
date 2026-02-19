@@ -29,9 +29,18 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
+        String jwt = null;
+
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (header != null && header.startsWith("Bearer ")) {
-            String jwt = header.substring(7);
+            jwt = header.substring(7);
+        }
+
+        if (jwt == null) {
+            jwt = request.getParameter("token");
+        }
+
+        if (jwt != null) {
             try {
                 Claims claims = Jwts.parser()
                         .keyLocator(this.jwtKeyLocator)
