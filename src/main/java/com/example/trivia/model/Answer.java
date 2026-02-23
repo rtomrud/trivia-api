@@ -12,6 +12,7 @@ public class Answer {
     private Long roundId;
     private Long questionId;
     private Long playerId;
+    private Long teamId;
     private Instant createdAt;
     private String answer;
 
@@ -48,6 +49,14 @@ public class Answer {
 
     public void setPlayerId(Long playerId) {
         this.playerId = playerId;
+    }
+
+    public Long getTeamId() {
+        return teamId;
+    }
+
+    public void setTeamId(Long teamId) {
+        this.teamId = teamId;
     }
 
     public Instant getCreatedAt() {

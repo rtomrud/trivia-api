@@ -55,6 +55,7 @@ CREATE TABLE answers (
     round_id BIGINT NOT NULL REFERENCES rounds(id),
     question_id BIGINT NOT NULL REFERENCES questions(id),
     player_id BIGINT NOT NULL REFERENCES players(id),
+    team_id BIGINT NOT NULL REFERENCES teams(id),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     answer TEXT NOT NULL
 );

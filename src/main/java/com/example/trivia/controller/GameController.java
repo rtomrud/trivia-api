@@ -256,6 +256,7 @@ public class GameController {
         answer.setRoundId(roundId);
         answer.setQuestionId(questionId);
         answer.setPlayerId(currentPlayer.getId());
+        answer.setTeamId(currentPlayer.getTeamId());
         answer.setAnswer(body.answer());
         answer.setCreatedAt(Instant.now());
         answer = answerRepo.save(answer);

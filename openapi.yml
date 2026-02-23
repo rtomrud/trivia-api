@@ -703,6 +703,8 @@ components:
           type: integer
         playerId:
           type: integer
+        teamId:
+          type: integer
         answer:
           type: string
 
