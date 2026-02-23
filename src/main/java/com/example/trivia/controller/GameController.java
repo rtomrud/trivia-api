@@ -119,6 +119,9 @@ public class GameController {
         game.setEndedAt(game.getCreatedAt().plus(Duration.ofSeconds(body.rounds() * body.timePerRound())));
         game = gameRepo.save(game);
 
+        room.setGameId(game.getId());
+        room = roomRepo.save(room);
+
         // Create rounds and questions for the game, based on the game's settings
         Set<Long> questionIds = new HashSet<>();
         long questionCount = questionRepo.count();

@@ -29,7 +29,6 @@ import com.example.trivia.dto.RoomJoinResponse;
 import com.example.trivia.model.Player;
 import com.example.trivia.model.Room;
 import com.example.trivia.model.Team;
-import com.example.trivia.repository.GameRepository;
 import com.example.trivia.repository.PlayerRepository;
 import com.example.trivia.repository.RoomRepository;
 import com.example.trivia.repository.TeamRepository;
@@ -38,7 +37,6 @@ import com.example.trivia.service.SseService;
 @RestController
 public class RoomController {
     private final JwtKeyLocator jwtKeyLocator;
-    private final GameRepository gameRepo;
     private final PlayerRepository playerRepo;
     private final RoomRepository roomRepo;
     private final TeamRepository teamRepo;
@@ -46,13 +44,11 @@ public class RoomController {
 
     public RoomController(
             JwtKeyLocator jwtKeyLocator,
-            GameRepository gameRepo,
             PlayerRepository playerRepo,
             RoomRepository roomRepo,
             TeamRepository teamRepo,
             SseService sseService) {
         this.jwtKeyLocator = jwtKeyLocator;
-        this.gameRepo = gameRepo;
         this.playerRepo = playerRepo;
         this.roomRepo = roomRepo;
         this.teamRepo = teamRepo;
@@ -102,8 +98,8 @@ public class RoomController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can delete a room");
         }
 
-        if (gameRepo.existsByRoomId(roomId)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot delete a room with existing games");
+        if (room.getGameId() != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot delete a room which has a game");
         }
 
         roomRepo.deleteById(roomId);

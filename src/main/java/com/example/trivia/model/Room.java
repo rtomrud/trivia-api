@@ -10,6 +10,7 @@ public class Room {
     @Id
     private Long id;
     private Long hostId;
+    private Long gameId;
     private Instant createdAt;
     private String code;
 
@@ -30,6 +31,14 @@ public class Room {
 
     public void setHostId(Long hostId) {
         this.hostId = hostId;
+    }
+
+    public Long getGameId() {
+        return gameId;
+    }
+
+    public void setGameId(Long gameId) {
+        this.gameId = gameId;
     }
 
     public Instant getCreatedAt() {

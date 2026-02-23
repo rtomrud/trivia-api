@@ -12,6 +12,4 @@ public interface GameRepository extends CrudRepository<Game, Long> {
     Page<Game> findAll(Pageable pageable);
 
     Page<Game> findByRoomId(Long roomId, Pageable pageable);
-
-    boolean existsByRoomId(Long roomId);
 }

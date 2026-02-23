@@ -72,7 +72,7 @@ paths:
         "404":
           description: Room not found
         "409":
-          description: Cannot delete a room with existing games
+          description: Cannot delete a room which has a game
 
   /rooms/{roomId}/events:
     get:
@@ -604,6 +604,9 @@ components:
         hostId:
           type: integer
           nullable: true # null if no host in the room
+        gameId:
+          type: integer
+          nullable: true # null if no game created yet in the room
         createdAt:
           type: string
           format: date-time
