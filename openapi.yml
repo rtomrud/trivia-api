@@ -231,6 +231,8 @@ paths:
           description: Only the host can create a team
         "404":
           description: Room not found
+        "409":
+          description: Cannot create a team during a game
 
     get:
       summary: Get the teams of a room
@@ -299,6 +301,8 @@ paths:
           description: Only the host can delete a team
         "404":
           description: Room or team not found
+        "409":
+          description: Cannot delete a team during a game
 
   /rooms/{roomId}/teams/{teamId}/players/{playerId}:
     put:
@@ -329,6 +333,8 @@ paths:
           description: Only the host can assign another player to a team
         "404":
           description: Room, team or player not found
+        "409":
+          description: Cannot assign a player to a team during a game
 
     delete:
       summary: Remove a player from a team
@@ -356,6 +362,8 @@ paths:
           description: Only the host can remove another player
         "404":
           description: Room, team or player not found
+        "409":
+          description: Cannot remove a player from a team during a game
 
   /games:
     get:

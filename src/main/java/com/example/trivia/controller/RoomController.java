@@ -228,6 +228,10 @@ public class RoomController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can create a team");
         }
 
+        if (room.getGameId() != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot create a team during a game");
+        }
+
         Team team = new Team();
         team.setRoomId(roomId);
         team = teamRepo.save(team);
@@ -272,6 +276,10 @@ public class RoomController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can delete a team");
         }
 
+        if (room.getGameId() != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot delete a team during a game");
+        }
+
         teamRepo.deleteById(teamId);
         sseService.publish(roomId.toString(), "team-deleted", teamId);
         return ResponseEntity.noContent().build();
@@ -300,6 +308,11 @@ public class RoomController {
         if (!room.getHostId().equals(currentPlayerId) && !playerId.equals(currentPlayerId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "Only the host can assign another player to a team");
+        }
+
+        if (room.getGameId() != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Cannot assign a player to a team during a game");
         }
 
         player.setTeamId(teamId);
@@ -331,6 +344,11 @@ public class RoomController {
         if (!room.getHostId().equals(currentPlayerId) && !playerId.equals(currentPlayerId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "Only the host can remove another player from a team");
+        }
+
+        if (room.getGameId() != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Cannot remove a player from a team during a game");
         }
 
         player.setTeamId(null);
