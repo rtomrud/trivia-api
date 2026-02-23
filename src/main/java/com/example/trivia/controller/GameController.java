@@ -113,6 +113,17 @@ public class GameController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can create a game");
         }
 
+        if (room.getGameId() != null) {
+            gameRepo.findById(room.getGameId())
+                    .ifPresent((Game game) -> {
+                        if (Instant.now().isBefore(game.getEndedAt())) {
+                            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                                    "Cannot create a new game during a game");
+                        }
+                    });
+
+        }
+
         Game game = new Game();
         game.setRoomId(body.roomId());
         game.setCreatedAt(Instant.now());

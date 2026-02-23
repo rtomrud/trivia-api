@@ -433,6 +433,8 @@ paths:
           description: Player not authenticated
         "403":
           description: Only the host can create a game
+        "409":
+          description: Cannot create a new game during a game
 
   /games/{gameId}:
     get:
