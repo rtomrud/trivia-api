@@ -34,6 +34,7 @@ import com.example.trivia.model.Question;
 import com.example.trivia.model.Room;
 import com.example.trivia.model.Round;
 import com.example.trivia.model.RoundQuestion;
+import com.example.trivia.model.RoundQuestionId;
 import com.example.trivia.repository.AnswerRepository;
 import com.example.trivia.repository.GameRepository;
 import com.example.trivia.repository.PlayerRepository;
@@ -159,8 +160,7 @@ public class GameController {
                 questionIds.add(question.getId());
 
                 RoundQuestion roundQuestion = new RoundQuestion();
-                roundQuestion.setRoundId(round.getId());
-                roundQuestion.setQuestionId(question.getId());
+                roundQuestion.setId(new RoundQuestionId(round.getId(), question.getId()));
                 roundQuestionRepo.save(roundQuestion);
             }
         }
