@@ -71,14 +71,17 @@ public class RoomController {
         Room room = roomRepo.findById(roomId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
-        Long currentPlayerId = (Long) request.getAttribute("playerId");
-        if (currentPlayerId == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
-        }
+        // If room is private
+        if (room.getCode() != null) {
+            Long currentPlayerId = (Long) request.getAttribute("playerId");
+            if (currentPlayerId == null) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
+            }
 
-        // Don't return the secret code if the player isn't in the room
-        if (!room.getHostId().equals(currentPlayerId)) {
-            room.setCode(null);
+            playerRepo.findById(currentPlayerId)
+                    .filter(player -> player.getRoomId().equals(roomId))
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN,
+                            "Only players inside a private room can view it"));
         }
 
         return ResponseEntity.ok(room);
