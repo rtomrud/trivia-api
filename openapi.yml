@@ -502,6 +502,8 @@ paths:
           description: Only the host can delete the game
         "404":
           description: Game not found
+        "409":
+          description: Cannot delete an ended game
 
   /games/{gameId}/rounds:
     get:

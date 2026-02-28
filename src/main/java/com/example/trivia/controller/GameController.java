@@ -195,6 +195,10 @@ public class GameController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can delete the game");
         }
 
+        if (Instant.now().isAfter(game.getEndedAt())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot delete an ended game");
+        }
+
         gameRepo.deleteById(gameId);
         sseService.publish(room.getId().toString(), "game-deleted", game.getId());
         return ResponseEntity.noContent().build();
