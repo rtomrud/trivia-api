@@ -14,6 +14,6 @@ import com.example.trivia.model.Question;
 public interface QuestionRepository extends CrudRepository<Question, Long> {
     Page<Question> findAll(Pageable pageable);
 
-    @Query("SELECT questions.* FROM questions JOIN round_questions ON questions.question_id = round_questions.question_id WHERE round_questions.round_id = :roundId")
+    @Query("SELECT questions.* FROM questions JOIN round_questions ON questions.id = round_questions.question_id WHERE round_questions.round_id = :roundId")
     List<Question> findByRoundId(Long roundId);
 }
