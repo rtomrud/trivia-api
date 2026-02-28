@@ -3,7 +3,7 @@ CREATE TABLE rooms (
     host_id BIGINT NULL,
     game_id BIGINT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    code VARCHAR(255) NOT NULL
+    code VARCHAR(255) NULL
 );
 
 CREATE TABLE teams (

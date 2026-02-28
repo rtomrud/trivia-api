@@ -9,6 +9,8 @@ import io.jsonwebtoken.Jwts;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +20,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.trivia.component.JwtKeyLocator;
 import com.example.trivia.dto.RoomCreationRequest;
@@ -33,6 +37,7 @@ import com.example.trivia.repository.PlayerRepository;
 import com.example.trivia.repository.RoomRepository;
 import com.example.trivia.repository.TeamRepository;
 import com.example.trivia.service.SseService;
+import com.example.trivia.util.LinkHeaderBuilder;
 
 @RestController
 public class RoomController {
@@ -64,6 +69,26 @@ public class RoomController {
 
         URI roomUrl = URI.create("/rooms/" + room.getId());
         return ResponseEntity.created(roomUrl).body(room);
+    }
+
+    @GetMapping("/rooms")
+    public ResponseEntity<List<Room>> getRooms(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Page<Room> rooms = roomRepo.findByCodeIsNull(PageRequest.of(page, size));
+
+        String url = UriComponentsBuilder.fromPath("/games")
+                .replaceQueryParam("page", page)
+                .replaceQueryParam("size", size)
+                .toUriString();
+
+        String linkHeader = LinkHeaderBuilder.buildWithPaginationLinks(
+                rooms.getNumber(),
+                rooms.getSize(),
+                rooms.getTotalPages(),
+                url);
+
+        return ResponseEntity.ok().header("Link", linkHeader).body(rooms.toList());
     }
 
     @GetMapping("/rooms/{roomId}")
@@ -136,7 +161,7 @@ public class RoomController {
         Room room = roomRepo.findById(roomId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
-        if (!room.getCode().equals(body.code())) {
+        if (room.getCode() != null && !room.getCode().equals(body.code())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid room code");
         }
 

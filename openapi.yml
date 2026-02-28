@@ -1,4 +1,4 @@
-openapi: 3.0.0
+ospenapi: 3.0.0
 info:
   title: Trivia API
   description: API for a trivia game
@@ -9,6 +9,32 @@ servers:
 
 paths:
   /rooms:
+    get:
+      summary: Get rooms (only public ones without a code)
+      operationId: getRooms
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Rooms retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Room"
+
     post:
       summary: Create a room
       operationId: createRoom
@@ -624,7 +650,7 @@ components:
           format: date-time
         code:
           type: string
-          nullable: true # null if current player is not in the room
+          nullable: true # null if room is public
 
     Team:
       type: object
