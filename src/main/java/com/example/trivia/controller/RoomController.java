@@ -197,19 +197,20 @@ public class RoomController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the host can delete another player");
         }
 
-        playerRepo.deleteById(playerId);
-
+        // Update room's host if the current host leaves
         if (room.getHostId().equals(currentPlayerId)) {
-            playerRepo.findByRoomId(roomId)
+            Long hostId = playerRepo.findByRoomId(roomId)
                     .stream()
                     .filter(player -> !player.getId().equals(playerId))
                     .findFirst()
-                    .ifPresent(player -> {
-                        room.setHostId(player.getId());
-                        roomRepo.save(room);
-                    });
+                    .map(Player::getId)
+                    .orElse(null);
+
+            room.setHostId(hostId);
+            roomRepo.save(room);
         }
 
+        playerRepo.deleteById(playerId);
         sseService.publish(roomId.toString(), "player-left", playerId);
         return ResponseEntity.noContent().build();
     }
