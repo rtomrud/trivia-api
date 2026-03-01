@@ -597,7 +597,7 @@ paths:
         "401":
           description: Player not authenticated
         "403":
-          description: Round has already ended or player is not in the room
+          description: Round has already ended or player is not in the room or in a team
         "404":
           description: Game, round or question not found
 

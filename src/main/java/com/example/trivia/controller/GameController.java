@@ -263,6 +263,10 @@ public class GameController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Round has already ended");
         }
 
+        if (currentPlayer.getTeamId() == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Player not in a team");
+        }
+
         Answer answer = answerRepo.findByRoundIdAndQuestionIdAndPlayerId(roundId, questionId, currentPlayerId)
                 .orElse(new Answer());
         answer.setRoundId(roundId);
