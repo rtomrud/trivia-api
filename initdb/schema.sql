@@ -59,5 +59,7 @@ CREATE TABLE answers (
     player_id BIGINT NOT NULL, -- No FK constraint
     team_id BIGINT NOT NULL, -- No FK constraint
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    answer TEXT NOT NULL
+    answer TEXT NOT NULL,
+    FOREIGN KEY (round_id, question_id) REFERENCES round_questions (round_id, question_id)
+        ON DELETE CASCADE
 );
