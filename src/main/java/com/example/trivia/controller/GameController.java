@@ -248,15 +248,19 @@ public class GameController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found"));
 
         Long currentPlayerId = (Long) request.getAttribute("playerId");
-        Player currentPlayer = playerRepo.findById(currentPlayerId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated"));
-
-        if (Instant.now().isAfter(round.getEndedAt())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Round has already ended");
+        if (currentPlayerId == null) {
+            new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
         }
+
+        Player currentPlayer = playerRepo.findById(currentPlayerId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Player is not in the room"));
 
         if (!currentPlayer.getRoomId().equals(game.getRoomId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Player is not in the room");
+        }
+
+        if (Instant.now().isAfter(round.getEndedAt())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Round has already ended");
         }
 
         Answer answer = answerRepo.findByRoundIdAndQuestionIdAndPlayerId(roundId, questionId, currentPlayerId)
