@@ -1,8 +1,13 @@
 package com.example.trivia.model;
 
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Table("rounds")
@@ -12,6 +17,10 @@ public class Round {
     private Long gameId;
     private Instant createdAt;
     private Instant endedAt;
+
+    @JsonIgnore
+    @MappedCollection(idColumn = "round_id")
+    private Set<QuestionRef> questions = new HashSet<>();
 
     public Round() {
     }
@@ -46,5 +55,19 @@ public class Round {
 
     public void setEndedAt(Instant endedAt) {
         this.endedAt = endedAt;
+    }
+
+    public Set<QuestionRef> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(Set<QuestionRef> questions) {
+        this.questions = questions;
+    }
+
+    public void addQuestion(Question question) {
+        QuestionRef questionRef = new QuestionRef();
+        questionRef.setQuestionId(question.getId());
+        questions.add(questionRef);
     }
 }

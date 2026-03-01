@@ -33,14 +33,11 @@ import com.example.trivia.model.Player;
 import com.example.trivia.model.Question;
 import com.example.trivia.model.Room;
 import com.example.trivia.model.Round;
-import com.example.trivia.model.RoundQuestion;
-import com.example.trivia.model.RoundQuestionId;
 import com.example.trivia.repository.AnswerRepository;
 import com.example.trivia.repository.GameRepository;
 import com.example.trivia.repository.PlayerRepository;
 import com.example.trivia.repository.QuestionRepository;
 import com.example.trivia.repository.RoomRepository;
-import com.example.trivia.repository.RoundQuestionRepository;
 import com.example.trivia.repository.RoundRepository;
 import com.example.trivia.service.SseService;
 import com.example.trivia.util.LinkHeaderBuilder;
@@ -52,7 +49,6 @@ public class GameController {
     private final PlayerRepository playerRepo;
     private final QuestionRepository questionRepo;
     private final RoomRepository roomRepo;
-    private final RoundQuestionRepository roundQuestionRepo;
     private final RoundRepository roundRepo;
     private final SseService sseService;
 
@@ -62,7 +58,6 @@ public class GameController {
             PlayerRepository playerRepo,
             QuestionRepository questionRepo,
             RoomRepository roomRepo,
-            RoundQuestionRepository roundQuestionRepo,
             RoundRepository roundRepo,
             SseService sseService) {
         this.answerRepo = answerRepo;
@@ -70,7 +65,6 @@ public class GameController {
         this.playerRepo = playerRepo;
         this.questionRepo = questionRepo;
         this.roomRepo = roomRepo;
-        this.roundQuestionRepo = roundQuestionRepo;
         this.roundRepo = roundRepo;
         this.sseService = sseService;
     }
@@ -146,7 +140,6 @@ public class GameController {
             round.setGameId(game.getId());
             round.setCreatedAt(Instant.now().plus(Duration.ofSeconds(body.timePerRound() * (roundNumber - 1))));
             round.setEndedAt(round.getCreatedAt().plus(Duration.ofSeconds(body.timePerRound())));
-            round = roundRepo.save(round);
 
             for (int questionNumber = 1; questionNumber <= body.questionsPerRound(); questionNumber++) {
                 // Find a random question, based on the game's settings
@@ -159,10 +152,10 @@ public class GameController {
                 // Store questionId to avoid repeating questions
                 questionIds.add(question.getId());
 
-                RoundQuestion roundQuestion = new RoundQuestion();
-                roundQuestion.setId(new RoundQuestionId(round.getId(), question.getId()));
-                roundQuestionRepo.save(roundQuestion);
+                round.addQuestion(question);
             }
+
+            round = roundRepo.save(round);
         }
 
         URI location = URI.create("/games/" + game.getId());

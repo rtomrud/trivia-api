@@ -11,7 +11,6 @@ import com.example.trivia.repository.GameRepository;
 import com.example.trivia.repository.PlayerRepository;
 import com.example.trivia.repository.QuestionRepository;
 import com.example.trivia.repository.RoomRepository;
-import com.example.trivia.repository.RoundQuestionRepository;
 import com.example.trivia.repository.RoundRepository;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -57,9 +56,6 @@ class GameControllerTest {
     
     @Mock
     private RoomRepository roomRepo;
-    
-    @Mock
-    private RoundQuestionRepository roundQuestionRepo;
     
     @Mock
     private RoundRepository roundRepo;
