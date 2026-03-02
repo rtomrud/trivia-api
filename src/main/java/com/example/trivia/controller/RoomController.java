@@ -140,16 +140,6 @@ public class RoomController {
         roomRepo.findById(roomId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Room not found"));
 
-        Long currentPlayerId = (Long) request.getAttribute("playerId");
-        if (currentPlayerId == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
-        }
-
-        playerRepo.findById(currentPlayerId)
-                .filter(player -> player.getRoomId().equals(roomId))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN,
-                        "Only players inside the room can subscribe to its events"));
-
         return sseService.subscribe(roomId.toString());
     }
 

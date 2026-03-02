@@ -119,10 +119,6 @@ paths:
             text/event-stream:
               schema:
                 type: string
-        "401":
-          description: Player not authenticated
-        "403":
-          description: Only players inside the room can subscribe to its events
 
   /rooms/{roomId}/players:
     post:
