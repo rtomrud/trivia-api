@@ -1,4 +1,6 @@
 package com.example.trivia.dto;
 
-public record AnswerSubmissionRequest(String answer) {
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public record AnswerSubmissionRequest(@JsonProperty(required = true) String answer) {
 }

@@ -1,4 +1,10 @@
 package com.example.trivia.dto;
 
-public record GameCreationRequest(Long roomId, Integer rounds, Integer timePerRound, Integer questionsPerRound) {
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public record GameCreationRequest(
+        @JsonProperty(required = true) Long roomId,
+        @JsonProperty(required = true) Integer rounds,
+        @JsonProperty(required = true) Integer timePerRound,
+        @JsonProperty(required = true) Integer questionsPerRound) {
 }

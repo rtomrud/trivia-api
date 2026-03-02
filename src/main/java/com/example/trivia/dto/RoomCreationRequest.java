@@ -1,4 +1,6 @@
 package com.example.trivia.dto;
 
-public record RoomCreationRequest(String code) {
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public record RoomCreationRequest(@JsonProperty(required = true) String code) {
 }
