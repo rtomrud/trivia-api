@@ -656,6 +656,45 @@ paths:
         "404":
           description: Game, round, question or answer not found
 
+  /games/{gameId}/rounds/{roundId}/questions/{questionId}/players/{playerId}:
+    get:
+      summary: Get the answer to a question by a player
+      operationId: getAnswer
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: questionId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: playerId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Answer retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Answer"
+        "401":
+          description: Player not authenticated
+        "403":
+          description: Cannot view an answer from a player in another team
+        "404":
+          description: Game, round, question, player or answer not found
+
 components:
   schemas:
     Room:

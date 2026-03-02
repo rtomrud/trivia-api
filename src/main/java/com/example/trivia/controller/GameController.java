@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -313,5 +314,50 @@ public class GameController {
 
         List<Answer> answers = answerRepo.findByRoundIdAndQuestionId(roundId, questionId);
         return ResponseEntity.ok(answers);
+    }
+
+    @GetMapping("/games/{gameId}/rounds/{roundId}/questions/{questionId}/players/{playerId}")
+    public ResponseEntity<Answer> getAnswer(
+            @PathVariable Long gameId,
+            @PathVariable Long roundId,
+            @PathVariable Long questionId,
+            @PathVariable Long playerId,
+            HttpServletRequest request) {
+        gameRepo.findById(gameId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found"));
+
+        Round round = roundRepo.findById(roundId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Round not found"));
+
+        if (!round.getQuestions().contains(new QuestionRef(questionId))) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found");
+        }
+
+        Long currentPlayerId = (Long) request.getAttribute("playerId");
+        if (currentPlayerId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
+        }
+
+        Player currentPlayer = playerRepo.findById(currentPlayerId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Player not in the game"));
+
+        if (currentPlayer.getTeamId() == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Player not in a team");
+        }
+
+        if (!currentPlayerId.equals(playerId)) {
+            Player player = playerRepo.findById(playerId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found"));
+
+            if (!currentPlayer.getTeamId().equals(player.getTeamId())) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                        "Cannot view an answer from a player in another team");
+            }
+        }
+
+        Answer answer = answerRepo.findByRoundIdAndQuestionIdAndPlayerId(roundId, questionId, playerId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Answer not found"));
+
+        return ResponseEntity.ok(answer);
     }
 }
