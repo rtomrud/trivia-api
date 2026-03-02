@@ -119,6 +119,8 @@ paths:
             text/event-stream:
               schema:
                 type: string
+        "404":
+          description: Room not found
 
   /rooms/{roomId}/players:
     post:
