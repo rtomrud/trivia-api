@@ -251,7 +251,7 @@ public class GameController {
 
         Long currentPlayerId = (Long) request.getAttribute("playerId");
         if (currentPlayerId == null) {
-            new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Player not authenticated");
         }
 
         Player currentPlayer = playerRepo.findById(currentPlayerId)
