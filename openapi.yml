@@ -526,6 +526,31 @@ paths:
         "404":
           description: Game not found
 
+  /games/{gameId}/rounds/{roundId}:
+    get:
+      summary: Get a round of a game
+      operationId: getRound
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: roundId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Round retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Round"
+        "404":
+          description: Game or round not found
+
   /games/{gameId}/rounds/{roundId}/questions:
     get:
       summary: Get the questions of a round

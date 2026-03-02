@@ -207,6 +207,17 @@ public class GameController {
         return ResponseEntity.ok(rounds);
     }
 
+    @GetMapping("/games/{gameId}/rounds/{roundId}")
+    public ResponseEntity<Round> getRound(@PathVariable Long gameId, @PathVariable Long roundId) {
+        gameRepo.findById(gameId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found"));
+
+        Round round = roundRepo.findById(roundId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Round not found"));
+
+        return ResponseEntity.ok(round);
+    }
+
     @GetMapping("/games/{gameId}/rounds/{roundId}/questions")
     public ResponseEntity<List<Question>> getRoundQuestions(@PathVariable Long gameId, @PathVariable Long roundId) {
         gameRepo.findById(gameId)
