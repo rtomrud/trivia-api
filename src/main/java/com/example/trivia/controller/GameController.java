@@ -31,6 +31,7 @@ import com.example.trivia.model.Answer;
 import com.example.trivia.model.Game;
 import com.example.trivia.model.Player;
 import com.example.trivia.model.Question;
+import com.example.trivia.model.QuestionRef;
 import com.example.trivia.model.Room;
 import com.example.trivia.model.Round;
 import com.example.trivia.repository.AnswerRepository;
@@ -244,8 +245,9 @@ public class GameController {
         Round round = roundRepo.findById(roundId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Round not found"));
 
-        questionRepo.findById(questionId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found"));
+        if (!round.getQuestions().contains(new QuestionRef(questionId))) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found");
+        }
 
         Long currentPlayerId = (Long) request.getAttribute("playerId");
         if (currentPlayerId == null) {

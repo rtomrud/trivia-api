@@ -9,6 +9,10 @@ public class QuestionRef {
     public QuestionRef() {
     }
 
+    public QuestionRef(Long questionId) {
+        this.questionId = questionId;
+    }
+
     public Long getQuestionId() {
         return questionId;
     }
