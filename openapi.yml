@@ -145,7 +145,6 @@ paths:
                   type: string
                 username:
                   type: string
-                  minLength: 3
               required:
                 - code
                 - username
@@ -439,15 +438,15 @@ paths:
                   type: integer
                 rounds:
                   type: integer
-                  minimum: 1
                 timePerRound:
                   type: integer
-                  minimum: 10
                 questionsPerRound:
                   type: integer
-                  minimum: 1
               required:
                 - roomId
+                - rounds
+                - timePerRound
+                - questionsPerRound
       responses:
         "201":
           description: Game created
