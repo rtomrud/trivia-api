@@ -42,19 +42,6 @@ services:
       timeout: 10s
       retries: 5
 
-  pgadmin:
-    image: dpage/pgadmin4
-    restart: unless-stopped
-    environment:
-      - PGADMIN_DEFAULT_SERVER=db
-      - PGADMIN_DEFAULT_EMAIL=postgres@example.com
-      - PGADMIN_DEFAULT_PASSWORD=postgres
-    ports:
-      - 8084:80
-    depends_on:
-      db:
-        condition: service_healthy
-
   redis:
     image: redis:8
     restart: unless-stopped
