@@ -38,17 +38,12 @@ paths:
     post:
       summary: Create a room
       operationId: createRoom
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                code:
-                  type: string
-              required:
-                - code
+      parameters:
+        - name: code
+          in: query
+          required: false
+          schema:
+            type: string
       responses:
         "201":
           description: Room created
@@ -57,12 +52,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/Room"
 
-  /rooms/{roomId}:
+  /rooms/{id}:
     get:
       summary: Get a room
       operationId: getRoom
       parameters:
-        - name: roomId
+        - name: id
           in: path
           required: true
           schema:
@@ -85,7 +80,7 @@ paths:
       summary: Delete a room
       operationId: deleteRoom
       parameters:
-        - name: roomId
+        - name: id
           in: path
           required: true
           schema:
@@ -102,12 +97,12 @@ paths:
         "409":
           description: Cannot delete a room which has a game
 
-  /rooms/{roomId}/events:
+  /rooms/{id}/events:
     get:
       summary: Subscribe to server-sent events (SSEs) about the room
       operationId: subscribeToRoomEvents
       parameters:
-        - name: roomId
+        - name: id
           in: path
           required: true
           schema:
@@ -122,30 +117,26 @@ paths:
         "404":
           description: Room not found
 
-  /rooms/{roomId}/players:
+  /players:
     post:
       summary: Join a room as a player
       operationId: joinRoom
       parameters:
         - name: roomId
-          in: path
+          in: query
           required: true
           schema:
             type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                code:
-                  type: string
-                username:
-                  type: string
-              required:
-                - code
-                - username
+        - name: code
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: username
+          in: query
+          required: true
+          schema:
+            type: string
       responses:
         "201":
           description: Joined the room
@@ -154,8 +145,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  player:
-                    $ref: "#/components/schemas/Player"
                   token:
                     type: string
         "400":
@@ -168,7 +157,7 @@ paths:
       operationId: getPlayers
       parameters:
         - name: roomId
-          in: path
+          in: query
           required: true
           schema:
             type: integer
@@ -184,17 +173,12 @@ paths:
         "404":
           description: Room not found
 
-  /rooms/{roomId}/players/{playerId}:
+  /players/{id}:
     get:
       summary: Get a player
       operationId: getPlayer
       parameters:
-        - name: roomId
-          in: path
-          required: true
-          schema:
-            type: integer
-        - name: playerId
+        - name: id
           in: path
           required: true
           schema:
@@ -207,18 +191,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/Player"
         "404":
-          description: Room or player not found
+          description: Player not found
 
     delete:
       summary: Remove a player from a room
       operationId: deletePlayer
       parameters:
-        - name: roomId
-          in: path
-          required: true
-          schema:
-            type: integer
-        - name: playerId
+        - name: id
           in: path
           required: true
           schema:
@@ -231,15 +210,15 @@ paths:
         "403":
           description: Only the host can delete another player
         "404":
-          description: Room or player not found
+          description: Player not found
 
-  /rooms/{roomId}/teams:
+  /teams:
     post:
       summary: Create a team
       operationId: createTeam
       parameters:
         - name: roomId
-          in: path
+          in: query
           required: true
           schema:
             type: integer
@@ -264,7 +243,7 @@ paths:
       operationId: getTeams
       parameters:
         - name: roomId
-          in: path
+          in: query
           required: true
           schema:
             type: integer
@@ -280,65 +259,11 @@ paths:
         "404":
           description: Room not found
 
-  /rooms/{roomId}/teams/{teamId}:
-    get:
-      summary: Get a team
-      operationId: getTeam
-      parameters:
-        - name: roomId
-          in: path
-          required: true
-          schema:
-            type: integer
-        - name: teamId
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: Team retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Team"
-        "404":
-          description: Room or team not found
-
-    delete:
-      summary: Delete a team
-      operationId: deleteTeam
-      parameters:
-        - name: roomId
-          in: path
-          required: true
-          schema:
-            type: integer
-        - name: teamId
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        "204":
-          description: Team deleted
-        "403":
-          description: Only the host can delete a team
-        "404":
-          description: Room or team not found
-        "409":
-          description: Cannot delete a team during a game
-
-  /rooms/{roomId}/teams/{teamId}/players/{playerId}:
+  /teams/{teamId}/players/{playerId}:
     put:
       summary: Assign a player to a team
       operationId: assignPlayerToTeam
       parameters:
-        - name: roomId
-          in: path
-          required: true
-          schema:
-            type: integer
         - name: teamId
           in: path
           required: true
@@ -357,7 +282,7 @@ paths:
         "403":
           description: Only the host can assign another player to a team
         "404":
-          description: Room, team or player not found
+          description: Player or team not found
         "409":
           description: Cannot assign a player to a team during a game
 
@@ -365,30 +290,68 @@ paths:
       summary: Remove a player from a team
       operationId: removePlayerFromTeam
       parameters:
-        - name: roomId
-          in: path
-          required: true
-          schema:
-            type: string
         - name: teamId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
         - name: playerId
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         "204":
           description: Player removed from team
+        "401":
+          description: Player not authenticated
         "403":
-          description: Only the host can remove another player
+          description: Only the host can remove another player from a team
         "404":
-          description: Room, team or player not found
+          description: Player or team not found
         "409":
           description: Cannot remove a player from a team during a game
+
+  /teams/{id}:
+    get:
+      summary: Get a team
+      operationId: getTeam
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Team retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Team"
+        "404":
+          description: Team not found
+
+    delete:
+      summary: Delete a team
+      operationId: deleteTeam
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Team deleted
+        "401":
+          description: Player not authenticated
+        "403":
+          description: Only the host can delete a team
+        "404":
+          description: Team not found
+        "409":
+          description: Cannot delete a team during a game
 
   /games:
     get:
@@ -425,26 +388,27 @@ paths:
     post:
       summary: Create a game with the players of a room
       operationId: createGame
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                roomId:
-                  type: integer
-                rounds:
-                  type: integer
-                timePerRound:
-                  type: integer
-                questionsPerRound:
-                  type: integer
-              required:
-                - roomId
-                - rounds
-                - timePerRound
-                - questionsPerRound
+      parameters:
+        - name: roomId
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: rounds
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: timePerRound
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: questionsPerRound
+          in: query
+          required: true
+          schema:
+            type: integer
       responses:
         "201":
           description: Game created
@@ -453,7 +417,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Game"
         "400":
-          description: Invalid room id
+          description: Invalid room id or not enough questions
         "401":
           description: Player not authenticated
         "403":
@@ -461,12 +425,12 @@ paths:
         "409":
           description: Cannot create a new game during a game
 
-  /games/{gameId}:
+  /games/{id}:
     get:
       summary: Get the details of a game
       operationId: getGame
       parameters:
-        - name: gameId
+        - name: id
           in: path
           required: true
           schema:
@@ -485,7 +449,7 @@ paths:
       summary: Delete a game
       operationId: deleteGame
       parameters:
-        - name: gameId
+        - name: id
           in: path
           required: true
           schema:
@@ -502,13 +466,13 @@ paths:
         "409":
           description: Cannot delete an ended game
 
-  /games/{gameId}/rounds:
+  /rounds:
     get:
       summary: Get the rounds of a game
       operationId: getRounds
       parameters:
         - name: gameId
-          in: path
+          in: query
           required: true
           schema:
             type: integer
@@ -524,17 +488,12 @@ paths:
         "404":
           description: Game not found
 
-  /games/{gameId}/rounds/{roundId}:
+  /rounds/{id}:
     get:
-      summary: Get a round of a game
+      summary: Get a round
       operationId: getRound
       parameters:
-        - name: gameId
-          in: path
-          required: true
-          schema:
-            type: integer
-        - name: roundId
+        - name: id
           in: path
           required: true
           schema:
@@ -547,20 +506,15 @@ paths:
               schema:
                 $ref: "#/components/schemas/Round"
         "404":
-          description: Game or round not found
+          description: Round not found
 
-  /games/{gameId}/rounds/{roundId}/questions:
+  /questions:
     get:
-      summary: Get the questions of a round
-      operationId: getRoundQuestions
+      summary: Get the questions of a round (correct answers hidden until the round ends)
+      operationId: getQuestions
       parameters:
-        - name: gameId
-          in: path
-          required: true
-          schema:
-            type: integer
         - name: roundId
-          in: path
+          in: query
           required: true
           schema:
             type: integer
@@ -576,25 +530,20 @@ paths:
         "403":
           description: Round has not started yet
         "404":
-          description: Game or round not found
+          description: Round not found
 
-  /games/{gameId}/rounds/{roundId}/questions/{questionId}:
+  /answers:
     post:
       summary: Submit the answer to a question
       operationId: submitAnswer
       parameters:
-        - name: gameId
-          in: path
-          required: true
-          schema:
-            type: integer
         - name: roundId
-          in: path
+          in: query
           required: true
           schema:
             type: integer
         - name: questionId
-          in: path
+          in: query
           required: true
           schema:
             type: integer
@@ -621,79 +570,46 @@ paths:
         "403":
           description: Round has already ended or player is not in the room or in a team
         "404":
-          description: Game, round or question not found
+          description: Round or question not found
 
     get:
-      summary: Get the answers of a question
+      summary: >
+        Get answers to a question. Without playerId, returns all answers after the round ends.
+        With playerId, returns that player's answer (only accessible to players on the same team).
       operationId: getAnswers
       parameters:
-        - name: gameId
-          in: path
-          required: true
-          schema:
-            type: integer
         - name: roundId
-          in: path
+          in: query
           required: true
           schema:
             type: integer
         - name: questionId
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: Answers retrieved
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Answer"
-        "403":
-          description: Round has not ended yet
-        "404":
-          description: Game, round, question or answer not found
-
-  /games/{gameId}/rounds/{roundId}/questions/{questionId}/players/{playerId}:
-    get:
-      summary: Get the answer to a question by a player
-      operationId: getAnswer
-      parameters:
-        - name: gameId
-          in: path
-          required: true
-          schema:
-            type: integer
-        - name: roundId
-          in: path
-          required: true
-          schema:
-            type: integer
-        - name: questionId
-          in: path
+          in: query
           required: true
           schema:
             type: integer
         - name: playerId
-          in: path
-          required: true
+          in: query
+          required: false
           schema:
             type: integer
       responses:
         "200":
-          description: Answer retrieved
+          description: Answer(s) retrieved
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Answer"
+                oneOf:
+                  - type: array
+                    items:
+                      $ref: "#/components/schemas/Answer"
+                  - $ref: "#/components/schemas/Answer"
         "401":
-          description: Player not authenticated
+          description: Player not authenticated (required when playerId is given)
         "403":
-          description: Cannot view an answer from a player in another team
+          description: Round has not ended yet, or cannot view an answer from a player in another team
         "404":
-          description: Game, round, question, player or answer not found
+          description: Round, question, player or answer not found
 
 components:
   schemas:
@@ -731,7 +647,7 @@ components:
         roomId:
           type: integer
         teamId:
-          type: string
+          type: integer
           nullable: true # null if player is not in a team
         username:
           type: string
@@ -798,6 +714,8 @@ components:
           type: integer
         teamId:
           type: integer
+        createdAt:
+          type: string
+          format: date-time
         answer:
           type: string
-
