@@ -81,6 +81,12 @@ erDiagram
     round_questions ||--o{ answers : "answered by"
 ```
 
+A player without a team assigned is in the room and can spectate the game but can't play (submit answers).
+
+Answers reference a player (via player_id) and a team (via team_id) without foreign key constraints, so players and teams can be deleted without removing their answers, preserving the historical record of past games.
+
+A room can only host one active game at a time, but games can be played sequentially in the same room.
+
 ## Functional requirements
 
 - R01. A player can create a room. Each room has a unique and random URL that can be shared with other players.
