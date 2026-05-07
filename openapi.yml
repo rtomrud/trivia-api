@@ -4,7 +4,7 @@ info:
   description: API for a trivia game
   version: 1.0.0
 servers:
-  - url: http://localhost:8083
+  - url: http://localhost:3000
     description: Development server
 
 paths:

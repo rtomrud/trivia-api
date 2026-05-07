@@ -8,6 +8,8 @@ A REST API for a trivia game.
 docker compose up
 ```
 
+You can access the API at http://localhost:3000
+
 ## API
 
 [Open OpenAPI spec in online SwaggerEditor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/rtomrud/trivia-api/refs/heads/master/openapi.yml)
