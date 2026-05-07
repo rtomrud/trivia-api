@@ -83,11 +83,15 @@ erDiagram
     round_questions ||--o{ answers : "answered by"
 ```
 
+A room with a code is private, so only players that know the code can join it, and a room without a code is public, so any players can join it.
+
+A player that joins an empty room (a room with no players) becomes the host of that room. If the host leaves the room, another player in that room becomes the host.
+
+A room can only host one active game at a time, but multiple games can be played sequentially in the same room.
+
 A player without a team assigned is in the room and can spectate the game but can't play (submit answers).
 
 Answers reference a player (via player_id) and a team (via team_id) without foreign key constraints, so players and teams can be deleted without removing their answers, preserving the historical record of past games.
-
-A room can only host one active game at a time, but games can be played sequentially in the same room.
 
 ## Functional requirements
 
