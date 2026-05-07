@@ -1,7 +1,6 @@
 # trivia-api
 
-A REST API for a trivia game.
-
+A REST API for a multiplayer trivia game. Players create or join rooms (public or private with a code), form teams, and compete across rounds of questions. Each round presents multiple-choice, short-answer, or buzzer questions — optionally with media — and players submit answers before the round ends, when the correct answers and scores are revealed.
 ## Running
 
 ```bash
